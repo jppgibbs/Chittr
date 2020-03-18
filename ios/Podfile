@@ -1,8 +1,8 @@
 platform :ios, '9.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-target 'TestProject' do
-  # Pods for TestProject
+target 'Chittr' do
+  # Pods for Chittr
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
   pod 'RCTRequired', :path => "../node_modules/react-native/Libraries/RCTRequired"
@@ -34,7 +34,7 @@ target 'TestProject' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
-  target 'TestProjectTests' do
+  target 'ChittrTests' do
     inherit! :search_paths
     # Pods for testing
   end
@@ -42,10 +42,10 @@ target 'TestProject' do
   use_native_modules!
 end
 
-target 'TestProject-tvOS' do
-  # Pods for TestProject-tvOS
+target 'Chittr-tvOS' do
+  # Pods for Chittr-tvOS
 
-  target 'TestProject-tvOSTests' do
+  target 'Chittr-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
   end

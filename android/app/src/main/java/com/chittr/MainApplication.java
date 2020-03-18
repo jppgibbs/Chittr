@@ -1,4 +1,4 @@
-package com.testproject;
+package com.chittr;
 
 import android.app.Application;
 import android.content.Context;

@@ -1,5 +1,5 @@
 {
-  "name": "TestProject",
+  "name": "Chittr",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -12,12 +12,16 @@
   "dependencies": {
     "@react-native-community/async-storage": "^1.8.1",
     "@react-native-community/masked-view": "^0.1.7",
+    "@react-navigation/native": "^5.1.0",
+    "@react-navigation/stack": "^5.2.1",
     "react": "16.9.0",
     "react-native": "0.61.5",
+    "react-native-elements": "^1.2.7",
     "react-native-gesture-handler": "^1.6.0",
     "react-native-reanimated": "^1.7.0",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.3.0",
+    "react-native-vector-icons": "^6.6.0",
     "react-navigation": "^4.3.1",
     "react-navigation-tabs": "^2.8.4"
   },
