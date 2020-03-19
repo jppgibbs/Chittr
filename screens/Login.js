@@ -35,7 +35,7 @@ class Login extends Component {
       console.log('Failed to store user. ' + error);
     }
   }
-
+  // Store auth token in async
   async storeToken() {
     try {
       await AsyncStorage.setItem('x_auth', JSON.stringify(this.state.x_auth));
@@ -62,11 +62,6 @@ class Login extends Component {
         },
       })
         .then(response => {
-          // !!: Possibly redundant
-          // Handle 2000 reply, if login was invalid
-          // if (response.status !== 200) {
-          //   console.log('Debug: invalid login');
-          // }
           return response.json();
         })
         .then(responseJson => {
