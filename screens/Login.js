@@ -4,7 +4,6 @@ import {
   TextInput,
   View,
   Alert,
-  Button,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
@@ -20,7 +19,6 @@ class Login extends Component {
       loggedIn: false,
       user_id: '',
       x_auth: '',
-      validation: '',
     };
   }
 
@@ -81,24 +79,25 @@ class Login extends Component {
           console.log('Login error: \n' + error);
           Alert.alert('Login Failed');
           this.setState({
-            loggedIn: true,
-            validation: 'Please enter a valid login',
+            loggedIn: false,
           });
         })
     );
   };
 
   render() {
+    // TODO: Make continue without logging in go home, make logout go home
     return (
-      <View style={styles.viewStyle}>
+      <View style={styles.mainView}>
         <Text style={styles.title}>Login</Text>
 
-        <Text>Email Address</Text>
+        <Text style={styles.bodyText}>Email Address</Text>
         <TextInput
           style={styles.textEntry}
           onChangeText={text => this.setState({email: text})}
           value={this.state.email}
           defaultValue="test@test.com"
+          placeholderTextColor="#918f8a"
           placeholder="example@example.com"
           textContentType="emailAddress"
           accessibilityComponentType="none"
@@ -106,11 +105,12 @@ class Login extends Component {
           accessibilityLabel="Enter email"
           accessibilityHint="Enter the email for the account you wish to login to"
         />
-        <Text>Password</Text>
+        <Text style={styles.bodyText}>Password</Text>
         <TextInput
           style={styles.textEntry}
           onChangeText={text => this.setState({password: text})}
           value={this.state.password}
+          placeholderTextColor="#918f8a"
           placeholder="Password"
           defaultValue="test"
           secureTextEntry
@@ -120,17 +120,17 @@ class Login extends Component {
           accessibilityHint="Enter the password for the account you wish to login to"
         />
         <TouchableOpacity onPress={() => this.login()} style={styles.button}>
-          <Text>Log In</Text>
+          <Text style={styles.bodyText}>Log In</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => this.createAccount()}
           style={styles.button}>
-          <Text>Create Account</Text>
+          <Text style={styles.bodyText}>Create Account</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => this.createAccount()}
           style={styles.button}>
-          <Text>Continue Without Logging In</Text>
+          <Text style={styles.bodyText}>Continue Without Logging In</Text>
         </TouchableOpacity>
       </View>
     );
@@ -138,11 +138,12 @@ class Login extends Component {
 }
 
 const styles = StyleSheet.create({
-  viewStyle: {
+  mainView: {
     justifyContent: 'center',
     flex: 1,
-    backgroundColor: 'aliceblue',
-    margin: 15,
+    flexDirection: 'column',
+    backgroundColor: '#17202b',
+    color: '#ffffff',
   },
   button: {
     alignItems: 'center',
@@ -154,21 +155,35 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 2,
     backgroundColor: '#2296f3',
+    marginLeft: 15,
+    marginRight: 15,
   },
   textEntry: {
     alignItems: 'center',
     padding: 5,
-
+    color: '#ffffff',
     marginTop: 5,
     marginBottom: 0,
     borderColor: '#2296f3',
     borderRadius: 2,
     borderWidth: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#273341',
     elevation: 3,
+    marginLeft: 15,
+    marginRight: 15,
   },
   title: {
     fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginLeft: 15,
+    marginRight: 15,
+    marginBottom: 5,
+  },
+  bodyText: {
+    color: '#ffffff',
+    marginLeft: 15,
+    marginRight: 15,
   },
 });
 

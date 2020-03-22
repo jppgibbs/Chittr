@@ -21,15 +21,13 @@ class GetChits extends Component {
       chit_content: '',
     };
   }
-
-  handleChitContent = text => {
-    this.setState({
-      chit_content: text,
-    });
-  };
+  componentDidMount() {
+    this.getData();
+  }
 
   getData() {
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits')
+    // Connect to mudfoot server and retreieve data
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=60')
       .then(response => response.json())
       .then(responseJson => {
         this.setState({
@@ -42,14 +40,18 @@ class GetChits extends Component {
       });
   }
 
-  componentDidMount() {
-    this.getData();
-  }
+  // Update chit content
+  setContent = text => {
+    this.setState({
+      chit_content: text,
+    });
+  };
 
   // Draw UI
   render() {
     const {navigate} = this.props.navigation;
     if (this.state.isLoading) {
+      // Show loading wheel if data isn't loaded yet
       return (
         <View>
           <ActivityIndicator />
@@ -66,15 +68,15 @@ class GetChits extends Component {
               onPress={() =>
                 // When pressed open chit window
                 navigate('ChitScreen', {
-                  userID: item.user.user_id,
-                  chitID: item.chit_id,
-                  chitContent: item.chit_content,
+                  user_id: item.user.user_id,
+                  chit_id: item.chit_id,
+                  chit_content: item.chit_content,
                   longitude: item.location.longitude,
                   latitude: item.location.latitude,
                 })
               }>
               <Text style={styles.chitContent}>
-              <Text style={styles.chitName}>
+                <Text style={styles.chitName}>
                   {item.user.given_name} {item.user.family_name}
                   {'\n'}
                   {'\n'}
@@ -102,6 +104,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     backgroundColor: '#17202b',
+    color: '#ffffff',
   },
   chitContent: {
     margin: 1,

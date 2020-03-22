@@ -2,18 +2,19 @@ import {createAppContainer} from 'react-navigation';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
 
 import Login from './screens/Login.js';
-import CreateAccount from './screens/CreateAccount.js';
+import Register from './screens/Register.js';
 
-import GetChits from './screens/GetChits.js';
+import Home from './screens/Home.js';
 import PostChits from './screens/PostChits.js';
 
 import SearchUsers from './screens/SearchUsers.js';
 
 import Camera from './screens/Camera.js';
+import UserProfile from './screens/UserProfile.js';
 
 const TabNavigator = createBottomTabNavigator({
   Home: {
-    screen: GetChits,
+    screen: Home,
   },
   Post: {
     screen: PostChits,
@@ -28,7 +29,10 @@ const TabNavigator = createBottomTabNavigator({
     screen: Login,
   },
   Register: {
-    screen: CreateAccount,
+    screen: Register,
+  },
+  Account: {
+    screen: UserProfile,
   },
 });
 
