@@ -5,6 +5,7 @@ import {
   Text,
   View,
   StyleSheet,
+  TouchableHighlight,
 } from 'react-native';
 
 class GetChits extends Component {
@@ -56,11 +57,40 @@ class GetChits extends Component {
       );
     }
     return (
-      <View>
+      <View style={styles.mainView}>
         <FlatList
+          style={styles.chitMargin}
           data={this.state.chitList}
-          renderItem={({item}) => <Text>{item.chit_content}</Text>}
-          keyExtractor={({id}, index) => id}
+          renderItem={({item}) => (
+            <TouchableHighlight
+              onPress={() =>
+                // When pressed open chit window
+                navigate('ChitScreen', {
+                  userID: item.user.user_id,
+                  chitID: item.chit_id,
+                  chitContent: item.chit_content,
+                  longitude: item.location.longitude,
+                  latitude: item.location.latitude,
+                })
+              }>
+              <Text style={styles.chitContent}>
+              <Text style={styles.chitName}>
+                  {item.user.given_name} {item.user.family_name}
+                  {'\n'}
+                  {'\n'}
+                </Text>
+                <Text>
+                  {item.chit_content}
+                  {'\n'}
+                  {'\n'}
+                </Text>
+                <Text style={styles.timestamp}>
+                  Sent on {new Date(item.timestamp).toLocaleString()}
+                </Text>
+              </Text>
+            </TouchableHighlight>
+          )}
+          keyExtractor={({chit_id}, primarykey) => chit_id.toString()}
         />
       </View>
     );
@@ -68,43 +98,28 @@ class GetChits extends Component {
 }
 
 const styles = StyleSheet.create({
-  loadingText: {
-    textAlign: 'center',
-    marginBottom: 50,
-    marginTop: 50,
-  },
   mainView: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#fcfbe4',
+    backgroundColor: '#17202b',
   },
-  buttonView: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 10,
-  },
-  topButton: {
-    backgroundColor: '#c7ddf5',
-    paddingLeft: 20,
-    paddingRight: 20,
-    paddingTop: 5,
-    paddingBottom: 5,
-    elevation: 5,
-    borderRadius: 10,
-  },
-  recentChits: {
-    fontWeight: 'bold',
-    paddingTop: 20,
-    textAlign: 'center',
-  },
-  chitItem: {
-    margin: 5,
+  chitContent: {
+    margin: 1,
     padding: 20,
-    borderRadius: 10,
-    backgroundColor: '#e6ffff',
+    borderRadius: 3,
+    borderColor: '#3a444d',
+    borderWidth: 2,
+    backgroundColor: '#1b2734',
     elevation: 2,
+    fontSize: 14,
+    color: '#ffffff',
   },
-  chitHeader: {
+  chitMargin: {
+    margin: 1,
+    padding: 20,
+  },
+  chitName: {
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });
