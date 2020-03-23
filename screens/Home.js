@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   FlatList,
   ActivityIndicator,
@@ -22,12 +22,15 @@ class GetChits extends Component {
     };
   }
   componentDidMount() {
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.getData();
+    });
     this.getData();
   }
 
   getData() {
     // Connect to mudfoot server and retreieve data
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=60')
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=20')
       .then(response => response.json())
       .then(responseJson => {
         this.setState({

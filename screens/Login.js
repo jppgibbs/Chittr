@@ -44,6 +44,37 @@ class Login extends Component {
       console.log('Failed to store token. ' + error);
     }
   }
+  async retrieveAccount() {
+    try {
+      // Retreieve from Async Storage
+      const user_id = await AsyncStorage.getItem('user_id');
+      const x_auth = await AsyncStorage.getItem('x_auth');
+      // Parse into JSON
+      const user_id_json = await JSON.parse(user_id);
+      const x_auth_json = await JSON.parse(x_auth);
+      this.setState({
+        x_auth: x_auth_json,
+        user_id: user_id_json,
+      });
+      // Set login state
+      // let loggedIn = 'true';
+      // if (x_auth && user_id != null) {
+      //   loggedIn = 'true';
+      // } else {
+      //   loggedIn = 'false';
+      // }
+      // // Store login state in async
+      // await AsyncStorage.setItem(loggedIn, this.state.loggedIn);
+      console.log(
+        'Debug: PostChit Loaded with uid: ' +
+          this.state.user_id +
+          ' auth key:' +
+          this.state.x_auth,
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
   // Login
   login = () => {
@@ -64,7 +95,7 @@ class Login extends Component {
         })
         .then(responseJson => {
           // Login Success
-          this.props.navigation.navigate('PostChits');
+          this.props.navigation.navigate('Home');
           this.setState({
             user_id: JSON.stringify(responseJson.id),
             x_auth: JSON.stringify(responseJson.token),
@@ -73,6 +104,8 @@ class Login extends Component {
           this.storeUser();
           this.storeToken();
           Alert.alert('Login Successful');
+          this.retrieveAccount();
+          this.props.navigation.navigate('Home');
         })
         // If the login fails
         .catch(error => {

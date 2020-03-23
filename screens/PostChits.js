@@ -21,7 +21,7 @@ class PostChits extends Component {
       long: null,
       locationPermission: false,
       geotag: false,
-      validation: '',
+      loggedIn: '',
     };
   }
   // Retrieve and parse user id and corresponding auth key from async storage
@@ -65,8 +65,9 @@ class PostChits extends Component {
     //this.validate();
   }
 
-  // When Pos Chit button is pressed
+  // When Post Chit button is pressed
   postChit() {
+    this.retrieveAccount();
     // Get current date and parse it
     var timestamp = Date.parse(new Date());
     // Format our request
@@ -92,13 +93,13 @@ class PostChits extends Component {
           .then(responseJSON => {
             Alert.alert('Posted Chit!');
             console.log('Chit successfully posted');
-            this.props.navigation.goBack(); // !! ! !!!!!! Change this to home and then make home refresh
+            this.props.navigation.navigate('Home');
           })
           .catch(error => {
-            console.error(error);
+            console.error('Chit failed to post: ' + error);
           });
       } catch (error) {
-        console.error(error);
+        console.error('chit failed to post: ' + error);
       }
     } else {
       Alert.alert('Cannot post blank chit');

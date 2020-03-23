@@ -17,8 +17,11 @@ class UserProfile extends Component {
     this.state = {
       email: '',
       password: '',
-      loggedIn: false,
+      given_name: '',
+      family_name: '',
+      loggedIn: '',
       user_id: '',
+      profile_id: '',
       x_auth: '',
       validation: '',
     };
@@ -28,6 +31,7 @@ class UserProfile extends Component {
       // Retreieve from Async Storage
       const user_id = await AsyncStorage.getItem('user_id');
       const x_auth = await AsyncStorage.getItem('x_auth');
+
       // Parse into JSON
       const user_id_json = await JSON.parse(user_id);
       const x_auth_json = await JSON.parse(x_auth);
@@ -54,7 +58,9 @@ class UserProfile extends Component {
   async clearAccount() {
     try {
       await AsyncStorage.removeItem('x_auth');
-      console.log('key removed');
+      await AsyncStorage.removeItem('user_id');
+      console.log('Cleared account information from async');
+      this.retrieveAccount();
     } catch (error) {
       console.log('Removing auth key failed: ' + error);
     }
@@ -64,11 +70,11 @@ class UserProfile extends Component {
       method: 'POST',
       withCredentials: true,
       headers: {
-        'X-Authorization': this.state.x_auth,
+        'X-Authorization': JSON.parse(this.state.x_auth),
         'Content-Type': 'application/json',
       },
     })
-      .then(jsonResponse => {
+      .then(responseJson => {
         this.clearAccount();
         this.props.navigation.navigate('Home');
       })
@@ -79,8 +85,15 @@ class UserProfile extends Component {
 
   render() {
     // TODO: Hide options based on login state
+    // if (this.state.user_id !== null) {
+    // If user is logged in
+    console.log('Debug: Profile loaded as logged in');
     return (
       <View style={styles.AccountControls}>
+        <Text style={styles.username}>
+          {this.state.given_name + ' ' + this.state.family_name}
+        </Text>
+
         <Text style={styles.title}>Account</Text>
 
         <Text style={styles.bodyText}>Navigate your account settings:</Text>
@@ -99,6 +112,23 @@ class UserProfile extends Component {
         </TouchableOpacity>
       </View>
     );
+    // } else {
+    // console.log('Debug: Profile loaded as logged out');
+    // return (
+    //   <View style={styles.AccountControls}>
+    //     <TouchableOpacity
+    //       onPress={() => this.props.navigation.navigate('Register')}
+    //       style={styles.button}>
+    //       <Text style={styles.bodyText}>Register</Text>
+    //     </TouchableOpacity>
+    //     <TouchableOpacity
+    //       onPress={() => this.props.navigation.navigate('Login')}
+    //       style={styles.button}>
+    //       <Text style={styles.bodyText}>Log In</Text>
+    //     </TouchableOpacity>
+    //   </View>
+    // );
+    //}
   }
 }
 
