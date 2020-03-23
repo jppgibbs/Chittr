@@ -22,6 +22,7 @@ class GetChits extends Component {
     };
   }
   componentDidMount() {
+    // Refresh chits when tab is navigated to
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.getData();
     });

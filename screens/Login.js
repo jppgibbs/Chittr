@@ -155,15 +155,11 @@ class Login extends Component {
         <TouchableOpacity onPress={() => this.login()} style={styles.button}>
           <Text style={styles.bodyText}>Log In</Text>
         </TouchableOpacity>
+        <Text style={styles.title}>Don't have an account?</Text>
         <TouchableOpacity
-          onPress={() => this.createAccount()}
+          onPress={() => this.props.navigation.navigate('Register')}
           style={styles.button}>
           <Text style={styles.bodyText}>Create Account</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.createAccount()}
-          style={styles.button}>
-          <Text style={styles.bodyText}>Continue Without Logging In</Text>
         </TouchableOpacity>
       </View>
     );
@@ -212,6 +208,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     marginRight: 15,
     marginBottom: 5,
+    marginTop: 25,
   },
   bodyText: {
     color: '#ffffff',

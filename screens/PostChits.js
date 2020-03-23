@@ -61,6 +61,9 @@ class PostChits extends Component {
   }
 
   componentDidMount() {
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.retrieveAccount();
+    });
     this.retrieveAccount();
     //this.validate();
   }
@@ -90,16 +93,22 @@ class PostChits extends Component {
             'X-Authorization': headerAuth,
           },
         })
-          .then(responseJSON => {
-            Alert.alert('Posted Chit!');
-            console.log('Chit successfully posted');
-            this.props.navigation.navigate('Home');
+          .then(response => {
+            // Check if response is unauthorized to give user feedback
+            if (response.status !== 401) {
+              Alert.alert('Posted Chit!');
+              console.log('Chit successfully posted');
+              this.props.navigation.navigate('Home');
+            } else {
+              Alert.alert('Failed to post. Please log in.');
+              console.log('Chit failed to post');
+            }
           })
           .catch(error => {
             console.error('Chit failed to post: ' + error);
           });
       } catch (error) {
-        console.error('chit failed to post: ' + error);
+        console.error('Chit failed to post: ' + error);
       }
     } else {
       Alert.alert('Cannot post blank chit');

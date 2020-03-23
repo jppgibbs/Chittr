@@ -43,7 +43,12 @@ class CreateAccount extends Component {
       },
     })
       .then(response => {
-        Alert.alert('Account Created');
+        if (response.status === 201) {
+          Alert.alert('Account Created');
+          this.props.navigation.navigate('Home');
+        } else {
+          Alert.alert('Account creation unsuccessful. Check your details.');
+        }
       })
       .catch(error => {
         console.error(error);
