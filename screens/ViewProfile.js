@@ -32,9 +32,11 @@ class UserProfile extends Component {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       console.log('secondary load');
       this.retrieveAccount();
+      this.getProfileData();
     });
     console.log('first load');
     this.retrieveAccount();
+    this.getProfileData();
   }
 
   async retrieveAccount() {
@@ -56,7 +58,6 @@ class UserProfile extends Component {
           ' auth key: ' +
           this.state.x_auth,
       );
-      this.getProfileData();
     } catch (e) {
       console.error(e);
     }

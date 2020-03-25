@@ -23,6 +23,7 @@ class UserProfile extends Component {
       family_name: '',
       loggedIn: '',
       user_id: '',
+      profile_id: '',
       x_auth: '',
       validation: '',
       profileData: [],
@@ -36,7 +37,6 @@ class UserProfile extends Component {
     console.log('first load');
     this.retrieveAccount();
   }
-
   async retrieveAccount() {
     try {
       // Retreieve from Async Storage
@@ -51,7 +51,7 @@ class UserProfile extends Component {
         user_id: user_id_json,
       });
       console.log(
-        'Debug: PostChit Loaded with uid: ' +
+        'Debug: EditAccount Loaded with uid: ' +
           this.state.user_id +
           ' auth key: ' +
           this.state.x_auth,
@@ -61,7 +61,6 @@ class UserProfile extends Component {
       console.error(e);
     }
   }
-
   getProfileData() {
     return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.user_id, {
       method: 'GET',
@@ -81,6 +80,7 @@ class UserProfile extends Component {
         console.log(error);
       });
   }
+
 
   // Logout
   async clearAccount() {
@@ -114,63 +114,44 @@ class UserProfile extends Component {
   };
 
   render() {
-    if (this.state.user_id !== null) {
-      // IF LOGGED IN
-      console.log('Debug: Profile loaded as logged in');
-      return (
-        <View style={styles.AccountControls}>
-          <Image
-            source={{
-              uri:
-                'http://10.0.2.2:3333/api/v0.0.5/user/' +
-                this.state.user_id +
-                '/photo',
-            }}
-            style={styles.profilePic}
-          />
-          <Text style={styles.nameText}>
-            {this.state.profileData.given_name}{' '}
-            {this.state.profileData.family_name}
-          </Text>
-          <Text style={styles.detailText}>{this.state.profileData.email}</Text>
-          <Text style={styles.detailText}>
-            Account ID: {this.state.profileData.user_id}
-          </Text>
-          <Text style={styles.title}>Account</Text>
-          <Text style={styles.bodyText}>Navigate your account settings:</Text>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('View Profile')}
-            style={styles.button}>
-            <Text style={styles.bodyText}>View Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('Edit Profile')}
-            style={styles.button}>
-            <Text style={styles.bodyText}>Edit Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.Logout()} style={styles.button}>
-            <Text style={styles.bodyText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    } else {
-      // IF LOGGED OUT
-      console.log('Debug: Profile loaded as logged out');
-      return (
-        <View style={styles.AccountControls}>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('Register')}
-            style={styles.button}>
-            <Text style={styles.bodyText}>Register</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('Login')}
-            style={styles.button}>
-            <Text style={styles.bodyText}>Log In</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
+    // IF LOGGED IN
+    console.log('Debug: Profile loaded as logged in');
+    return (
+      <View style={styles.AccountControls}>
+        <Image
+          source={{
+            uri:
+              'http://10.0.2.2:3333/api/v0.0.5/user/' +
+              this.state.user_id +
+              '/photo',
+          }}
+          style={styles.profilePic}
+        />
+        <Text style={styles.nameText}>
+          {this.state.profileData.given_name}{' '}
+          {this.state.profileData.family_name}
+        </Text>
+        <Text style={styles.detailText}>{this.state.profileData.email}</Text>
+        <Text style={styles.detailText}>
+          Account ID: {this.state.profileData.user_id}
+        </Text>
+        <Text style={styles.title}>Account</Text>
+        <Text style={styles.bodyText}>Navigate your account settings:</Text>
+        <TouchableOpacity
+          onPress={() => this.props.navigation.navigate('View Profile')}
+          style={styles.button}>
+          <Text style={styles.bodyText}>View Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => this.props.navigation.navigate('Edit Profile')}
+          style={styles.button}>
+          <Text style={styles.bodyText}>Edit Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => this.Logout()} style={styles.button}>
+          <Text style={styles.bodyText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
 }
 

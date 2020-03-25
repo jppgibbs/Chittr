@@ -134,6 +134,11 @@ class PostChits extends Component {
         <TouchableOpacity onPress={() => this.postChit()} style={styles.button}>
           <Text style={styles.bodyText}>Post Chit</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+            onPress={() => this.props.navigation.navigate('Camera')}
+            style={styles.button}>
+            <Text style={styles.bodyText}>Camera</Text>
+          </TouchableOpacity>
       </View>
     );
   }

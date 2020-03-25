@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-class CreateAccount extends Component {
+class EditAccount extends Component {
   // Construct variables with default empty values
   constructor(props) {
     super(props);
@@ -24,8 +24,38 @@ class CreateAccount extends Component {
       validation: '',
     };
   }
+  componentDidMount() {
+    // Refresh chits when tab is navigated to
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.retrieveAccount();
+    });
+    this.retrieveAccount();
+  }
+  async retrieveAccount() {
+    try {
+      // Retreieve from Async Storage
+      const user_id = await AsyncStorage.getItem('user_id');
+      const x_auth = await AsyncStorage.getItem('x_auth');
 
-  createAccount() {
+      // Parse into JSON
+      const user_id_json = await JSON.parse(user_id);
+      const x_auth_json = await JSON.parse(x_auth);
+      this.setState({
+        x_auth: x_auth_json,
+        user_id: user_id_json,
+      });
+      console.log(
+        'Debug: EditAccount Loaded with uid: ' +
+          this.state.user_id +
+          ' auth key: ' +
+          this.state.x_auth,
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  editAccount() {
     let res1 = JSON.stringify({
       given_name: this.state.given_name,
       family_name: this.state.family_name,
@@ -34,23 +64,21 @@ class CreateAccount extends Component {
     });
 
     console.log(res1);
-
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/user', {
-      method: 'POST',
+    let headerAuth = JSON.parse(this.state.x_auth);
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.user_id, {
+      method: 'PATCH',
       body: res1,
       headers: {
         'Content-Type': 'application/json',
+        'X-Authorization': headerAuth,
       },
     })
       .then(response => {
         if (response.status === 201) {
-          Alert.alert('Account Created', 'Log in with your new account!');
+          Alert.alert('Account Edited');
           this.props.navigation.navigate('Account');
         } else {
-          Alert.alert(
-            'Creation Failed',
-            'Account creation unsuccessful. Check your details.',
-          );
+          Alert.alert('Account edit unsuccessful. Check your details.');
         }
       })
       .catch(error => {
@@ -59,11 +87,10 @@ class CreateAccount extends Component {
   }
 
   render() {
-    // TODO: Make this passwords validate with each other
     return (
       <View style={styles.viewStyle} accessible={true}>
         <Text style={styles.title} accessibilityRole="text">
-          Create Account
+          Edit Account
         </Text>
         <Text style={styles.bodyText} accessibilityRole="text">
           First Name
@@ -124,10 +151,10 @@ class CreateAccount extends Component {
           accessibilityHint="Enter the password you wish to use for your account"
         />
         <TouchableOpacity
-          onPress={() => this.createAccount()}
+          onPress={() => this.editAccount()}
           style={styles.button}>
           <Text style={styles.bodyText} accessibilityRole="text">
-            Create Account
+            Submit Changes
           </Text>
         </TouchableOpacity>
       </View>
@@ -184,4 +211,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateAccount;
+export default EditAccount;

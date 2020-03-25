@@ -1,4 +1,5 @@
-import React, {Component, useEffect, useState} from 'react';
+import React, {Component} from 'react';
+
 import {
   FlatList,
   ActivityIndicator,
@@ -7,6 +8,7 @@ import {
   StyleSheet,
   TouchableHighlight,
 } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 class GetChits extends Component {
   constructor(props) {
@@ -21,12 +23,38 @@ class GetChits extends Component {
       chit_content: '',
     };
   }
+  async retrieveAccount() {
+    try {
+      // Retreieve from Async Storage
+      const user_id = await AsyncStorage.getItem('user_id');
+      const x_auth = await AsyncStorage.getItem('x_auth');
+
+      // Parse into JSON
+      const user_id_json = await JSON.parse(user_id);
+      const x_auth_json = await JSON.parse(x_auth);
+      this.setState({
+        x_auth: x_auth_json,
+        user_id: user_id_json,
+      });
+      console.log(
+        'Debug: PostChit Loaded with uid: ' +
+          this.state.user_id +
+          ' auth key: ' +
+          this.state.x_auth,
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   componentDidMount() {
     // Refresh chits when tab is navigated to
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.getData();
+      this.retrieveAccount();
     });
     this.getData();
+    this.retrieveAccount();
   }
 
   getData() {

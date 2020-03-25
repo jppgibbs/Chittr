@@ -56,15 +56,6 @@ class Login extends Component {
         x_auth: x_auth_json,
         user_id: user_id_json,
       });
-      // Set login state
-      // let loggedIn = 'true';
-      // if (x_auth && user_id != null) {
-      //   loggedIn = 'true';
-      // } else {
-      //   loggedIn = 'false';
-      // }
-      // // Store login state in async
-      // await AsyncStorage.setItem(loggedIn, this.state.loggedIn);
       console.log(
         'Debug: PostChit Loaded with uid: ' +
           this.state.user_id +
@@ -80,6 +71,7 @@ class Login extends Component {
   login = () => {
     console.log('Debug: Attempting login...');
     return (
+      // API Request
       fetch('http://10.0.2.2:3333/api/v0.0.5/login', {
         method: 'POST',
         body: JSON.stringify({
@@ -94,23 +86,23 @@ class Login extends Component {
           return response.json();
         })
         .then(responseJson => {
-          // Login Success
+          // If login succeeds go home and store auth
           this.props.navigation.navigate('Home');
           this.setState({
             user_id: JSON.stringify(responseJson.id),
             x_auth: JSON.stringify(responseJson.token),
           });
-          console.log('Login successful');
+          console.log('Debug: Login successful');
           this.storeUser();
           this.storeToken();
-          Alert.alert('Login Successful');
+          Alert.alert('Login', 'Successfully Logged in');
           this.retrieveAccount();
-          this.props.navigation.navigate('Home');
+          this.props.navigation.navigate('Account');
         })
         // If the login fails
         .catch(error => {
-          console.log('Login error: \n' + error);
-          Alert.alert('Login Failed');
+          console.log('Debug: Login error: \n' + error);
+          Alert.alert('Login Failed', 'Please check your login details');
           this.setState({
             loggedIn: false,
           });
@@ -119,12 +111,14 @@ class Login extends Component {
   };
 
   render() {
-    // TODO: Make continue without logging in go home, make logout go home
     return (
-      <View style={styles.mainView}>
-        <Text style={styles.title}>Login</Text>
-
-        <Text style={styles.bodyText}>Email Address</Text>
+      <View style={styles.mainView} accessible={true}>
+        <Text style={styles.title} accessibilityRole="text">
+          Login
+        </Text>
+        <Text style={styles.bodyText} accessibilityRole="text">
+          Email Address
+        </Text>
         <TextInput
           style={styles.textEntry}
           onChangeText={text => this.setState({email: text})}
@@ -138,7 +132,9 @@ class Login extends Component {
           accessibilityLabel="Enter email"
           accessibilityHint="Enter the email for the account you wish to login to"
         />
-        <Text style={styles.bodyText}>Password</Text>
+        <Text style={styles.bodyText} accessibilityRole="text">
+          Password
+        </Text>
         <TextInput
           style={styles.textEntry}
           onChangeText={text => this.setState({password: text})}
@@ -152,14 +148,29 @@ class Login extends Component {
           accessibilityLabel="Enter password"
           accessibilityHint="Enter the password for the account you wish to login to"
         />
-        <TouchableOpacity onPress={() => this.login()} style={styles.button}>
+
+        <TouchableOpacity
+          onPress={() => this.login()}
+          style={styles.button}
+          accessibilityComponentType="button"
+          accessibilityRole="button"
+          accessibilityLabel="Log in"
+          accessibilityHint="Press this to confirm your details and log into your account">
           <Text style={styles.bodyText}>Log In</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Don't have an account?</Text>
+        <Text style={styles.title} accessibilityRole="text">
+          Don't have an account?
+        </Text>
         <TouchableOpacity
           onPress={() => this.props.navigation.navigate('Register')}
-          style={styles.button}>
-          <Text style={styles.bodyText}>Create Account</Text>
+          style={styles.button}
+          accessibilityComponentType="button"
+          accessibilityRole="button"
+          accessibilityLabel="Register"
+          accessibilityHint="Register a new account">
+          <Text style={styles.bodyText} accessibilityRole="text">
+            Create Account
+          </Text>
         </TouchableOpacity>
       </View>
     );
