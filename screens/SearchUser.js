@@ -24,8 +24,7 @@ class SearchUserScreen extends Component {
   //Retrieves ProfileID using AsyncStorage
   storeProfileID = async id => {
     try {
-      console.log('ID:', id);
-      await AsyncStorage.setItem('@profileid', JSON.stringify(id));
+      await AsyncStorage.setItem('view_user_id', JSON.stringify(id));
     } catch (error) {
       console.log(error);
     }

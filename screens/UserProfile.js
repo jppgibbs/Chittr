@@ -30,11 +30,11 @@ class UserProfile extends Component {
   }
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      console.log('secondary load');
       this.retrieveAccount();
+      this.storeProfileID();
     });
-    console.log('first load');
     this.retrieveAccount();
+    this.storeProfileID();
   }
 
   async retrieveAccount() {
@@ -61,6 +61,14 @@ class UserProfile extends Component {
       console.error(e);
     }
   }
+
+  storeProfileID = async user_id => {
+    try {
+      await AsyncStorage.setItem('view_user_id', JSON.stringify(user_id));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   getProfileData() {
     return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.user_id, {
@@ -123,7 +131,7 @@ class UserProfile extends Component {
             source={{
               uri:
                 'http://10.0.2.2:3333/api/v0.0.5/user/' +
-                this.state.user_id +
+                this.state.profileData.user_id +
                 '/photo',
             }}
             style={styles.profilePic}

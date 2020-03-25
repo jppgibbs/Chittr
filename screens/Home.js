@@ -103,8 +103,8 @@ class GetChits extends Component {
                   user_id: item.user.user_id,
                   chit_id: item.chit_id,
                   chit_content: item.chit_content,
-                  longitude: item.location.longitude,
-                  latitude: item.location.latitude,
+                  // longitude: item.location.longitude,
+                  // latitude: item.location.latitude,
                 })
               }>
               <Text style={styles.chitContent}>
