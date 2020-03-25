@@ -16,6 +16,8 @@ import Camera from './screens/Camera.js';
 
 import SearchUserScreen from './screens/SearchUser.js';
 import OtherUserProfile from './screens/otherUserProfile.js';
+import Followers from './screens/Followers.js';
+import Following from './screens/Following.js';
 //import Account from './screens/Account.js';
 
 //const Tab = createBottomTabNavigator();
@@ -88,8 +90,8 @@ function Search() {
       }}>
       <Stack.Screen name="Search Users" component={SearchUserScreen} />
       <Stack.Screen name="Viewing Profile" component={OtherUserProfile} />
-      <Stack.Screen name="View Followers" component={SearchUserScreen} />
-      <Stack.Screen name="View Following" component={OtherUserProfile} />
+      <Stack.Screen name="View Followers" component={Followers} />
+      <Stack.Screen name="View Following" component={Following} />
     </Stack.Navigator>
   );
 }

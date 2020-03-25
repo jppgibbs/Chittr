@@ -16,7 +16,7 @@ import Modal from 'react-native-modal';
 import {Avatar, Overlay} from 'react-native-elements';
 import {Icon, SearchBar, ListItem} from 'react-native-elements';
 
-class UserProfile extends Component {
+class viewOtherProfile extends Component {
   // Construct variables with default empty values
   constructor(props) {
     super(props);
@@ -25,11 +25,9 @@ class UserProfile extends Component {
       password: '',
       given_name: '',
       family_name: '',
-      loggedIn: '',
       user_id: '',
       view_user_id: '',
       x_auth: '',
-      validation: '',
       profileData: [],
       followerList: [],
       followingList: [],
@@ -209,11 +207,11 @@ class UserProfile extends Component {
   }
 
   // Modal Overlay
-  setModalVisible(visible) {
+  setFollowersVisible(visible) {
     this.setState({modalVisible: visible});
   }
   // Modal Overlay
-  setModalVisible2(visible) {
+  setFollowingVisible(visible) {
     this.setState({modalVisible2: visible});
   }
 
@@ -235,6 +233,7 @@ class UserProfile extends Component {
           backdropTransitionInTiming={600}
           backdropTransitionOutTiming={600}>
           <View style={styles.modalContent}>
+            <Text style={styles.title}>Followers</Text>
             <FlatList
               data={this.state.followerList}
               renderItem={({item}) => (
@@ -253,7 +252,7 @@ class UserProfile extends Component {
             <Button
               testID={'close-button'}
               onPress={() => {
-                this.setModalVisible(!this.state.modalVisible);
+                this.setFollowersVisible(!this.state.modalVisible);
               }}
               title="Close"
             />
@@ -273,6 +272,7 @@ class UserProfile extends Component {
           backdropTransitionInTiming={600}
           backdropTransitionOutTiming={600}>
           <View style={styles.modalContent}>
+            <Text style={styles.title}>Following</Text>
             <FlatList
               data={this.state.followingList}
               renderItem={({item}) => (
@@ -280,9 +280,8 @@ class UserProfile extends Component {
                   containerStyle={styles.listItem}
                   title={item.given_name + ' ' + item.family_name}
                   subtitle={item.email}
-                  titleStyle={{color: 'white', fontWeight: 'bold'}}
-                  subtitleStyle={{color: 'white'}}
-                  onPress={() => this.viewProfile(item.user_id)}
+                  titleStyle={styles.listItemTitle}
+                  subtitleStyle={styles.listItemSubtitle}
                 />
               )}
               keyExtractor={({user_id}, index) => user_id}
@@ -291,7 +290,7 @@ class UserProfile extends Component {
             <Button
               testID={'close-button'}
               onPress={() => {
-                this.setModalVisible2(!this.state.modalVisible2);
+                this.setFollowingVisible(!this.state.modalVisible2);
               }}
               title="Close"
             />
@@ -321,12 +320,12 @@ class UserProfile extends Component {
           <Text style={styles.bodyText}>Unfollow</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => this.setModalVisible()}
+          onPress={() => this.setFollowersVisible()}
           style={styles.button}>
           <Text style={styles.bodyText}>View Followers</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => this.setModalVisible()}
+          onPress={() => this.setFollowingVisible()}
           style={styles.button}>
           <Text style={styles.bodyText}>View Following</Text>
         </TouchableOpacity>
@@ -338,9 +337,8 @@ class UserProfile extends Component {
               containerStyle={styles.listItem}
               title={item.given_name + ' ' + item.family_name}
               subtitle={item.email}
-              titleStyle={{color: 'white', fontWeight: 'bold'}}
-              subtitleStyle={{color: 'white'}}
-              onPress={() => this.viewProfile(item.user_id)}
+              titleStyle={styles.listItemTitle}
+              subtitleStyle={styles.listItemSubtitle}
             />
           )}
           keyExtractor={({user_id}, index) => user_id}
@@ -365,6 +363,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#17202b',
     color: '#ffffff',
   },
+  listItemTitle: {color: 'white', fontWeight: 'bold'},
+  listItemSubtitle: {color: 'white'},
   button: {
     alignItems: 'center',
     elevation: 2,
@@ -443,4 +443,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserProfile;
+export default viewOtherProfile;

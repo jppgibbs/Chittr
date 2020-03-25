@@ -1,16 +1,7 @@
 import React, {Component} from 'react';
-import {
-  Text,
-  TextInput,
-  View,
-  Button,
-  Alert,
-  FlatList,
-  StyleSheet,
-} from 'react-native';
+import {TextInput, View, FlatList, StyleSheet} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import LinearGradient from 'react-native-linear-gradient';
-import {Icon, SearchBar, ListItem} from 'react-native-elements';
+import {ListItem} from 'react-native-elements';
 
 class SearchUserScreen extends Component {
   constructor(props) {
@@ -80,8 +71,8 @@ class SearchUserScreen extends Component {
               containerStyle={styles.listItem}
               title={item.given_name + ' ' + item.family_name}
               subtitle={item.email}
-              titleStyle={{color: 'white', fontWeight: 'bold'}}
-              subtitleStyle={{color: 'white'}}
+              titleStyle={styles.listItemTitle}
+              subtitleStyle={styles.listItemSubtitle}
               onPress={() => this.viewProfile(item.user_id)}
             />
           )}
@@ -99,6 +90,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#17202b',
     color: '#ffffff',
   },
+  listItemTitle: {color: 'white', fontWeight: 'bold'},
+  listItemSubtitle: {color: 'white'},
   textEntry: {
     alignItems: 'center',
     padding: 5,
