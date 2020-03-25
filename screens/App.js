@@ -88,6 +88,8 @@ function Search() {
       }}>
       <Stack.Screen name="Search Users" component={SearchUserScreen} />
       <Stack.Screen name="Viewing Profile" component={OtherUserProfile} />
+      <Stack.Screen name="View Followers" component={SearchUserScreen} />
+      <Stack.Screen name="View Following" component={OtherUserProfile} />
     </Stack.Navigator>
   );
 }
