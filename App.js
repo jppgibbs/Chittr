@@ -16,6 +16,7 @@ import Camera from './screens/Camera.js';
 
 import SearchUserScreen from './screens/SearchUser.js';
 import OtherUserProfile from './screens/otherUserProfile.js';
+import ChangeProfilePic from './screens/ChangePictureScreen.js';
 //import Account from './screens/Account.js';
 
 //const Tab = createBottomTabNavigator();
@@ -56,6 +57,7 @@ function Account() {
       <Stack.Screen name="Register" component={Register} />
       <Stack.Screen name="View Profile" component={ViewProfile} />
       <Stack.Screen name="Edit Profile" component={EditProfile} />
+      <Stack.Screen name="Change Profile Pic" component={ChangeProfilePic} />
     </Stack.Navigator>
   );
 }

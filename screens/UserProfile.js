@@ -21,31 +21,31 @@ class UserProfile extends Component {
       password: '',
       given_name: '',
       family_name: '',
-      loggedIn: '',
       user_id: '',
       x_auth: '',
-      validation: '',
       profileData: [],
+      profilePicture: null,
     };
   }
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.retrieveAccount();
-      this.storeProfileID();
+
+      // this.storeProfileID();
     });
     this.retrieveAccount();
-    this.storeProfileID();
+    // this.storeProfileID();
   }
 
   async retrieveAccount() {
     try {
       // Retreieve from Async Storage
-      const user_id = await AsyncStorage.getItem('user_id');
-      const x_auth = await AsyncStorage.getItem('x_auth');
+      let user_id = await AsyncStorage.getItem('user_id');
+      let x_auth = await AsyncStorage.getItem('x_auth');
 
       // Parse into JSON
-      const user_id_json = await JSON.parse(user_id);
-      const x_auth_json = await JSON.parse(x_auth);
+      let user_id_json = await JSON.parse(user_id);
+      let x_auth_json = await JSON.parse(x_auth);
       this.setState({
         x_auth: x_auth_json,
         user_id: user_id_json,
@@ -61,14 +61,6 @@ class UserProfile extends Component {
       console.error(e);
     }
   }
-
-  storeProfileID = async user_id => {
-    try {
-      await AsyncStorage.setItem('view_user_id', JSON.stringify(user_id));
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   getProfileData() {
     return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.user_id, {
@@ -129,10 +121,13 @@ class UserProfile extends Component {
         <View style={styles.AccountControls}>
           <Image
             source={{
-              uri:
-                'http://10.0.2.2:3333/api/v0.0.5/user/' +
-                this.state.profileData.user_id +
-                '/photo',
+              uri: JSON.stringify(
+                fetch(
+                  'http://10.0.2.2:3333/api/v0.0.5/user/' +
+                    this.state.user_id +
+                    '/photo',
+                ),
+              ),
             }}
             style={styles.profilePic}
           />
@@ -155,6 +150,11 @@ class UserProfile extends Component {
             onPress={() => this.props.navigation.navigate('Edit Profile')}
             style={styles.button}>
             <Text style={styles.bodyText}>Edit Profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => this.props.navigation.navigate('Change Profile Pic')}
+            style={styles.button}>
+            <Text style={styles.bodyText}>Edit Photo</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => this.Logout()} style={styles.button}>
             <Text style={styles.bodyText}>Logout</Text>

@@ -59,7 +59,6 @@ class CreateAccount extends Component {
   }
 
   render() {
-    // TODO: Make this passwords validate with each other
     return (
       <View style={styles.viewStyle} accessible={true}>
         <Text style={styles.title} accessibilityRole="text">

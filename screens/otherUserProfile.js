@@ -329,20 +329,6 @@ class viewOtherProfile extends Component {
           style={styles.button}>
           <Text style={styles.bodyText}>View Following</Text>
         </TouchableOpacity>
-        <FlatList
-          style={styles.list}
-          data={this.state.followerList}
-          renderItem={({item}) => (
-            <ListItem
-              containerStyle={styles.listItem}
-              title={item.given_name + ' ' + item.family_name}
-              subtitle={item.email}
-              titleStyle={styles.listItemTitle}
-              subtitleStyle={styles.listItemSubtitle}
-            />
-          )}
-          keyExtractor={({user_id}, index) => user_id}
-        />
       </View>
     );
   }

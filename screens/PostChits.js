@@ -21,7 +21,7 @@ class PostChits extends Component {
       long: null,
       locationPermission: false,
       geotag: false,
-      loggedIn: '',
+      modalVisible: false,
     };
   }
   // Retrieve and parse user id and corresponding auth key from async storage
@@ -135,10 +135,10 @@ class PostChits extends Component {
           <Text style={styles.bodyText}>Post Chit</Text>
         </TouchableOpacity>
         <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('Camera')}
-            style={styles.button}>
-            <Text style={styles.bodyText}>Camera</Text>
-          </TouchableOpacity>
+          onPress={() => this.props.navigation.navigate('Camera')}
+          style={styles.button}>
+          <Text style={styles.bodyText}>Add Photo</Text>
+        </TouchableOpacity>
       </View>
     );
   }
