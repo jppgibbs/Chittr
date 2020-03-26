@@ -13,38 +13,38 @@ class SearchUserScreen extends Component {
   }
 
   //Retrieves ProfileID using AsyncStorage
-  storeProfileID = async id => {
+  storeSelection = async view_user_id => {
     try {
-      await AsyncStorage.setItem('view_user_id', JSON.stringify(id));
+      await AsyncStorage.setItem('view_user_id', JSON.stringify(view_user_id));
     } catch (error) {
       console.log(error);
     }
   };
 
-  //Search Function which stays blank if there is no text, or displays and adds results to dataList if there is
-  search = text => {
+  search = async text => {
     this.setState({search: text});
     if (text === '') {
       this.setState({
         dataList: [],
       });
     } else {
-      return fetch('http://10.0.2.2:3333/api/v0.0.5/search_user?q=' + text)
-        .then(response => response.json())
-        .then(responseJson => {
-          this.setState({
-            dataList: responseJson,
-          });
-        })
-        .catch(error => {
-          console.log(error);
+      try {
+        const response = await fetch(
+          'http://10.0.2.2:3333/api/v0.0.5/search_user?q=' + text,
+        );
+        const responseJson = await response.json();
+        this.setState({
+          dataList: responseJson,
         });
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
   //Navigate to single profile function
-  viewProfile = id => {
-    this.storeProfileID(id);
+  viewProfile = view_user_id => {
+    this.storeSelection(view_user_id);
     this.props.navigation.navigate('Viewing Profile');
   };
 
