@@ -1,20 +1,17 @@
 import React, {Component} from 'react';
 import {
   Text,
-  TextInput,
   View,
   Alert,
   Button,
   StyleSheet,
   TouchableOpacity,
   Image,
-  TouchableHighlight,
   FlatList,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Modal from 'react-native-modal';
-import {Avatar, Overlay} from 'react-native-elements';
-import {Icon, SearchBar, ListItem} from 'react-native-elements';
+import {ListItem} from 'react-native-elements';
 
 class viewOtherProfile extends Component {
   // Construct variables with default empty values

@@ -7,6 +7,7 @@ import {
   Alert,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from 'react-native-geolocation-service';

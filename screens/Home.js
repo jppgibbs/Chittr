@@ -21,6 +21,8 @@ class GetChits extends Component {
       given_name: '',
       family_name: '',
       chit_content: '',
+      longitude: '',
+      latitude: '',
     };
   }
   async retrieveAccount() {
@@ -103,8 +105,8 @@ class GetChits extends Component {
                   user_id: item.user.user_id,
                   chit_id: item.chit_id,
                   chit_content: item.chit_content,
-                  // longitude: item.location.longitude,
-                  // latitude: item.location.latitude,
+                  longitude: item.location.longitude,
+                  latitude: item.location.latitude,
                 })
               }>
               <Text style={styles.chitContent}>
@@ -120,6 +122,14 @@ class GetChits extends Component {
                 </Text>
                 <Text style={styles.timestamp}>
                   Sent on {new Date(item.timestamp).toLocaleString()}
+                </Text>
+                {'\n'}
+                <Text style={styles.timestamp}>
+                  Sent from{' '}
+                  {'Location: ' +
+                    this.state.latitude +
+                    ' ' +
+                    this.state.longitude}
                 </Text>
               </Text>
             </TouchableHighlight>

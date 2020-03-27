@@ -84,7 +84,7 @@ class UserProfile extends Component {
         <Image
           source={{
             uri:
-              'http://10.0.2.2:3333/api/v0.0.5/user/' +
+              'http://localhost:3333/api/v0.0.5/user/' +
               this.state.profileData.view_user_id +
               '/photo',
           }}

@@ -27,15 +27,6 @@ class UserProfile extends Component {
       profilePicture: null,
     };
   }
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.retrieveAccount();
-
-      // this.storeProfileID();
-    });
-    this.retrieveAccount();
-    // this.storeProfileID();
-  }
 
   async retrieveAccount() {
     try {
@@ -102,7 +93,7 @@ class UserProfile extends Component {
         'Content-Type': 'application/json',
       },
     })
-      .then(responseJson => {
+      .then(respnoseJson => {
         this.clearAccount();
         Alert.alert('Logout', 'Successfully Logged Out');
         this.props.navigation.navigate('Account');
@@ -113,21 +104,27 @@ class UserProfile extends Component {
       });
   };
 
+  componentDidMount() {
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.retrieveAccount();
+    });
+    this.retrieveAccount();
+  }
+
   render() {
     if (this.state.user_id !== null) {
       // IF LOGGED IN
-      console.log('Debug: Profile loaded as logged in');
+      console.log('Debug: Profile loaded as logged in asdasda');
+      console.log(this.state.x_auth);
       return (
         <View style={styles.AccountControls}>
           <Image
             source={{
-              uri: JSON.stringify(
-                fetch(
-                  'http://10.0.2.2:3333/api/v0.0.5/user/' +
-                    this.state.user_id +
-                    '/photo',
-                ),
-              ),
+              uri:
+                'http://10.0.2.2:3333/api/v0.0.5/user/' +
+                this.state.user_id +
+                '/photo?timestamp=' +
+                Date.now(),
             }}
             style={styles.profilePic}
           />

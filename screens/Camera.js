@@ -20,33 +20,42 @@ class Camera extends Component {
     };
   }
 
-  //Camera Function
   takePhoto = async () => {
-    if (this.camera) {
-      const options = {quality: 0.5, base64: true};
-      const imageRecieved = this.props.navigation.getParam(
-        'imageRecieved',
-        () => {},
-      );
-      const data = await this.camera.takePictureAsync(options);
-      imageRecieved(data);
-    }
+    const options = {quality: 1, base64: true};
+    const data = await this.camera.takePictureAsync(options);
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/user/photo', {
+      method: 'POST',
+      body: await this.camera.takePictureAsync(options),
+      headers: {
+        'Content-Type': 'image/jpeg',
+        'X-Authorization': JSON.parse(this.state.x_auth),
+      },
+    })
+      .then(response => {
+        this.props.navigation.goBack();
+        console.log('Photo taken');
+      })
+      .catch(error => {
+        console.error('Error taking photo: ' + error);
+      });
   };
 
   render() {
     return (
-      <View style={styles.container}>
+      <View style={styles.camContainer}>
         <RNCamera
           ref={ref => {
             this.camera = ref;
           }}
           style={styles.preview}
         />
-        <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            onPress={this.takePhoto.bind(this)}
-            style={styles.capture}>
-            <Text style={{fontSize: 16}}>CAPTURE</Text>
+            onPress={() => {
+              this.takePhoto;
+            }}
+            style={styles.button}>
+            <Text style={styles.title}>Take Photo</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -55,15 +64,30 @@ class Camera extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {flex: 1, flexDirection: 'column'},
   preview: {flex: 1, justifyContent: 'flex-end', alignItems: 'center'},
-  capture: {
+  camContainer: {flex: 1, flexDirection: 'column'},
+  buttonContainer: {
     flex: 0,
-    borderRadius: 5,
-    padding: 15,
-    paddingHorizontal: 20,
     alignSelf: 'center',
-    margin: 20,
+    margin: 10,
+  },
+  button: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+    padding: 10,
+    borderColor: '#101010',
+    borderWidth: 1,
+    borderRadius: 2,
+    backgroundColor: '#2296f3',
+    width: '100%',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
   },
 });
 
