@@ -3,14 +3,39 @@ import {
   Text,
   TextInput,
   View,
-  Button,
   Alert,
   StyleSheet,
   TouchableOpacity,
-  Image,
+  PermissionsAndroid,
 } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from 'react-native-geolocation-service';
+import Geocoder from 'react-native-geocoding';
+import AsyncStorage from '@react-native-community/async-storage';
+
+async function requestLocationPermission() {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Lab04 Location Permission',
+        message: 'This app requires access to your location.',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log('You can access location');
+      return true;
+    } else {
+      console.log('Location permission denied');
+      return false;
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+}
+
 class PostChits extends Component {
   constructor(props) {
     super(props);
@@ -20,6 +45,7 @@ class PostChits extends Component {
       chit_content: '',
       lat: null,
       long: null,
+      location: null,
       locationPermission: false,
       geotag: false,
       modalVisible: false,
@@ -66,8 +92,50 @@ class PostChits extends Component {
       this.retrieveAccount();
     });
     this.retrieveAccount();
-    //this.validate();
+    this.findCoordinates();
   }
+
+  findCoordinates = () => {
+    if (!this.state.locationPermission) {
+      this.state.locationPermission = requestLocationPermission();
+    }
+    Geolocation.getCurrentPosition(
+      position => {
+        const longitude = JSON.stringify(position.coords.longitude);
+        const latitude = JSON.stringify(position.coords.latitude);
+        this.setState({
+          longitude: longitude,
+          latitude: latitude,
+        });
+        console.log('Debug: Found location: ' + longitude + latitude);
+
+        // let location = {
+        //   longitude: this.longitude,
+        //   latitude: this.latitude,
+        // };
+        // this.setState({location});
+        // console.log(location);
+
+        // Geocode
+        // Geocoder.from(this.latitude, this.longitude).then(json => {
+        //   console.log(json);
+        //   let addressComponent = json.results[5].formatted_address;
+        //   this.setState({
+        //     location: addressComponent,
+        //   });
+        //   console.log(addressComponent);
+        // });
+      },
+      error => {
+        Alert.alert(error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 20000,
+        maximumAge: 1000,
+      },
+    );
+  };
 
   // When Post Chit button is pressed
   postChit() {
@@ -78,6 +146,10 @@ class PostChits extends Component {
     let request = JSON.stringify({
       chit_content: this.state.chit_content,
       timestamp: timestamp,
+      location: {
+        longitude: JSON.parse(this.state.longitude),
+        latitude: JSON.parse(this.state.latitude),
+      },
     });
     // Format the auth key for the header
     let headerAuth = JSON.parse(this.state.x_auth);
@@ -95,11 +167,12 @@ class PostChits extends Component {
           },
         })
           .then(response => {
+            console.log(response);
             // Check if response is unauthorized to give user feedback
             if (response.status !== 401) {
               Alert.alert('Posted Chit!');
               console.log('Chit successfully posted');
-              this.props.navigation.navigate('Home');
+              //this.props.navigation.navigate('Home');
             } else {
               Alert.alert('Failed to post. Please log in.');
               console.log('Chit failed to post');
@@ -116,6 +189,13 @@ class PostChits extends Component {
       console.log('Debug: Rejected posting blank chit');
     }
   }
+
+  postChitWithPhoto() {
+    // TODO: Improve this to not show alerts (add nav to home to camera)
+    this.postChit();
+    this.props.navigation.navigate('Camera');
+  }
+
   render() {
     // TODO: Visible character limit counter
     return (
@@ -136,7 +216,8 @@ class PostChits extends Component {
           <Text style={styles.bodyText}>Post Chit</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => this.props.navigation.navigate('Camera')}
+          // onPress={() => this.props.navigation.navigate('Camera')}
+          onPress={() => this.postChitWithPhoto()}
           style={styles.button}>
           <Text style={styles.bodyText}>Add Photo</Text>
         </TouchableOpacity>

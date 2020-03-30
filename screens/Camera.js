@@ -1,36 +1,86 @@
 import React, {Component} from 'react';
-import {
-  Text,
-  TextInput,
-  View,
-  Button,
-  Alert,
-  FlatList,
-  StyleSheet,
-} from 'react-native';
+import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {RNCamera} from 'react-native-camera';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+//import {TouchableOpacity} from 'react-native-gesture-handler';
 
-class Camera extends Component {
+class AddChitPhoto extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      photo: null,
+      x_auth: '',
+      user_id: '',
+      chit_id: '',
     };
+  }
+  // Get account info from async on first load and every subsequent navigation
+  componentDidMount() {
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.retrieveAccount();
+    });
+    this.retrieveAccount();
+  }
+  // Function loads the user ID and the x-auth token from async storage and stores in state.
+  async retrieveAccount() {
+    try {
+      // Retreieve from Async Storage
+      const user_id = await AsyncStorage.getItem('user_id');
+      const x_auth = await AsyncStorage.getItem('x_auth');
+      const chit_id = await AsyncStorage.getItem('chit_id');
+
+      // Parse into JSON
+      const user_id_json = await JSON.parse(user_id);
+      const x_auth_json = await JSON.parse(x_auth);
+      const chit_id_json = await JSON.parse(chit_id);
+
+      this.setState({
+        x_auth: x_auth_json,
+        user_id: user_id_json,
+        chit_id: chit_id_json,
+      });
+      console.log(
+        'Debug: Camera Loaded with uid: ' +
+          this.state.user_id +
+          ' auth key: ' +
+          this.state.x_auth,
+      );
+    } catch (e) {
+      console.error(e);
+    }
+    this.getMostRecentChit;
+  }
+
+  getMostRecentChit() {
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.user_id)
+      .then(response => response.json())
+      .then(responseJson => {
+        let chit_id = responseJson.recent_chits[0].chit_id;
+        this.setState({
+          chit_id: chit_id,
+        });
+        console.log(chit_id);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   takePhoto = async () => {
+    await this.getMostRecentChit();
+    let chit_id = this.state.chit_id;
     const options = {quality: 1, base64: true};
-    const data = await this.camera.takePictureAsync(options);
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/user/photo', {
-      method: 'POST',
-      body: await this.camera.takePictureAsync(options),
-      headers: {
-        'Content-Type': 'image/jpeg',
-        'X-Authorization': JSON.parse(this.state.x_auth),
+    console.log('Adding photo to ' + chit_id);
+    return fetch(
+      'http://10.0.2.2:3333/api/v0.0.5/chits/' + this.state.chit_id + '/photo',
+      {
+        method: 'POST',
+        body: await this.camera.takePictureAsync(options),
+        headers: {
+          'Content-Type': 'image/jpeg',
+          'X-Authorization': JSON.parse(this.state.x_auth),
+        },
       },
-    })
+    )
       .then(response => {
         this.props.navigation.goBack();
         console.log('Photo taken');
@@ -42,39 +92,31 @@ class Camera extends Component {
 
   render() {
     return (
-      <View style={styles.camContainer}>
+      <View style={styles.primaryView}>
         <RNCamera
+          captureAudio={false}
+          style={styles.cameraFrame}
           ref={ref => {
             this.camera = ref;
           }}
-          style={styles.preview}
         />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              this.takePhoto;
-            }}
-            style={styles.button}>
-            <Text style={styles.title}>Take Photo</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          onPress={this.takePhoto.bind(this)}
+          style={styles.button}>
+          <Text style={styles.title}>Take Picture</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  preview: {flex: 1, justifyContent: 'flex-end', alignItems: 'center'},
-  camContainer: {flex: 1, flexDirection: 'column'},
-  buttonContainer: {
-    flex: 0,
-    alignSelf: 'center',
-    margin: 10,
+  primaryView: {
+    flex: 1,
+    flexDirection: 'column',
+    backgroundColor: '#17202b',
   },
   button: {
-    flex: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
     elevation: 2,
     padding: 10,
@@ -82,8 +124,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 2,
     backgroundColor: '#2296f3',
-    width: '100%',
   },
+  cameraFrame: {flex: 1, justifyContent: 'flex-end', alignItems: 'center'},
   title: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -91,4 +133,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Camera;
+export default AddChitPhoto;

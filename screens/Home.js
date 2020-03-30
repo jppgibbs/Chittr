@@ -94,6 +94,7 @@ class GetChits extends Component {
     }
     return (
       <View style={styles.mainView}>
+
         <FlatList
           style={styles.chitMargin}
           data={this.state.chitList}
@@ -125,11 +126,10 @@ class GetChits extends Component {
                 </Text>
                 {'\n'}
                 <Text style={styles.timestamp}>
-                  Sent from{' '}
-                  {'Location: ' +
-                    this.state.latitude +
+                  {/* {'Location: ' +
+                    item.location.latitude +
                     ' ' +
-                    this.state.longitude}
+                    item.location.longitude} */}
                 </Text>
               </Text>
             </TouchableHighlight>
