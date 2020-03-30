@@ -9,7 +9,6 @@ import {
   PermissionsAndroid,
 } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
-import Geocoder from 'react-native-geocoding';
 import AsyncStorage from '@react-native-community/async-storage';
 
 async function requestLocationPermission() {
@@ -17,7 +16,7 @@ async function requestLocationPermission() {
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       {
-        title: 'Lab04 Location Permission',
+        title: 'Location Permission',
         message: 'This app requires access to your location.',
         buttonNeutral: 'Ask Me Later',
         buttonNegative: 'Cancel',

@@ -7,6 +7,7 @@ import {
   View,
   StyleSheet,
   TouchableHighlight,
+  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -38,12 +39,6 @@ class GetChits extends Component {
         x_auth: x_auth_json,
         user_id: user_id_json,
       });
-      console.log(
-        'Debug: PostChit Loaded with uid: ' +
-          this.state.user_id +
-          ' auth key: ' +
-          this.state.x_auth,
-      );
     } catch (e) {
       console.error(e);
     }
@@ -81,6 +76,24 @@ class GetChits extends Component {
     });
   };
 
+  renderMessage = (location, latitude, longitude) => {
+    // if (location !== undefined) {
+    if (
+      location !== undefined ||
+      (latitude !== undefined && !!longitude !== undefined)
+    ) {
+      return (
+        <Text style={styles.timestamp}>
+          {'Location: ' + latitude + ', ' + longitude}
+        </Text>
+      );
+    } else {
+      return (
+        <Text>Not found</Text> // OR WHATEVER YOU WANT HERE
+      );
+    }
+  };
+
   // Draw UI
   render() {
     const {navigate} = this.props.navigation;
@@ -94,7 +107,6 @@ class GetChits extends Component {
     }
     return (
       <View style={styles.mainView}>
-
         <FlatList
           style={styles.chitMargin}
           data={this.state.chitList}
@@ -125,12 +137,26 @@ class GetChits extends Component {
                   Sent on {new Date(item.timestamp).toLocaleString()}
                 </Text>
                 {'\n'}
-                <Text style={styles.timestamp}>
-                  {/* {'Location: ' +
-                    item.location.latitude +
-                    ' ' +
-                    item.location.longitude} */}
-                </Text>
+                {item.location == undefined ? (
+                  (item.location = 'No Location')
+                ) : (
+                  <Text style={styles.timestamp}>
+                    {'Location: ' +
+                      item.location.latitude +
+                      ' ' +
+                      item.location.longitude}
+                  </Text>
+                )}
+                {'\n'}
+                <Image
+                  source={{
+                    uri:
+                      'http://10.0.2.2:3333/api/v0.0.5/chits/' +
+                      item.chit_id +
+                      '/photo',
+                  }}
+                  style={styles.chitImage}
+                />
               </Text>
             </TouchableHighlight>
           )}
@@ -166,6 +192,11 @@ const styles = StyleSheet.create({
   chitName: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  chitImage: {
+    width: 350,
+    height: 200,
+    backgroundColor: 'white',
   },
 });
 
