@@ -225,10 +225,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  chitImage: {
-    width: 320,
-    height: 240,
-  },
+  chitImage: {},
   chitHideImage: {},
 });
 

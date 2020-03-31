@@ -17,7 +17,7 @@ import Camera from './screens/Camera.js';
 import SearchUserScreen from './screens/SearchUser.js';
 import OtherUserProfile from './screens/otherUserProfile.js';
 import ChangeProfilePic from './screens/ChangePictureScreen.js';
-//import Account from './screens/Account.js';
+import Drafts from './screens/Drafts.js';
 
 //const Tab = createBottomTabNavigator();
 const Tab = createBottomTabNavigator();
@@ -74,6 +74,7 @@ function Post() {
       }}>
       <Stack.Screen name="New Chit" component={PostChits} />
       <Stack.Screen name="Camera" component={Camera} />
+      <Stack.Screen name="My Drafts" component={Drafts} />
     </Stack.Navigator>
   );
 }

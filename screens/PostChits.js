@@ -178,6 +178,11 @@ class PostChits extends Component {
     this.props.navigation.navigate('Camera');
   }
 
+  saveDraft() {
+    
+    this.props.navigation.navigate('My Drafts');
+  }
+
   render() {
     // TODO: Visible character limit counter
     return (
@@ -202,6 +207,16 @@ class PostChits extends Component {
           onPress={() => this.postChitWithPhoto()}
           style={styles.button}>
           <Text style={styles.bodyText}>Add Photo</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => this.postChitWithPhoto()}
+          style={styles.button}>
+          <Text style={styles.bodyText}>Save Draft</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => this.props.navigation.navigate('My Drafts')}
+          style={styles.button}>
+          <Text style={styles.bodyText}>View Drafts</Text>
         </TouchableOpacity>
       </View>
     );
