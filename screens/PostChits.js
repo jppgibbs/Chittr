@@ -107,23 +107,6 @@ class PostChits extends Component {
           latitude: latitude,
         });
         console.log('Debug: Found location: ' + longitude + latitude);
-
-        // let location = {
-        //   longitude: this.longitude,
-        //   latitude: this.latitude,
-        // };
-        // this.setState({location});
-        // console.log(location);
-
-        // Geocode
-        // Geocoder.from(this.latitude, this.longitude).then(json => {
-        //   console.log(json);
-        //   let addressComponent = json.results[5].formatted_address;
-        //   this.setState({
-        //     location: addressComponent,
-        //   });
-        //   console.log(addressComponent);
-        // });
       },
       error => {
         Alert.alert(error.message);

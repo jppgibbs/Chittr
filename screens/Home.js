@@ -6,10 +6,11 @@ import {
   Text,
   View,
   StyleSheet,
+  ImagePlaceholder,
   TouchableHighlight,
-  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import {Card, Image, ListItem, Button, Icon} from 'react-native-elements';
 
 class GetChits extends Component {
   constructor(props) {
@@ -56,7 +57,7 @@ class GetChits extends Component {
 
   getData() {
     // Connect to mudfoot server and retreieve data
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=20')
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=5')
       .then(response => response.json())
       .then(responseJson => {
         this.setState({
@@ -76,22 +77,34 @@ class GetChits extends Component {
     });
   };
 
-  renderMessage = (location, latitude, longitude) => {
-    // if (location !== undefined) {
-    if (
-      location !== undefined ||
-      (latitude !== undefined && !!longitude !== undefined)
-    ) {
-      return (
-        <Text style={styles.timestamp}>
-          {'Location: ' + latitude + ', ' + longitude}
-        </Text>
-      );
-    } else {
-      return (
-        <Text>Not found</Text> // OR WHATEVER YOU WANT HERE
-      );
-    }
+  // Attempt at removing unloaded images from chit
+  renderImage = chit_id => {
+    // // Build JSON request
+    // fetch(
+    //   'http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=5' +
+    //     chit_id +
+    //     '/photo',
+    // ).then(response => {
+    //   // Check for 404
+    //   // console.log(response);
+    //   console.log(response.size);
+    //   if (response.status !== 404) {
+    //     console.log(response.status + ' ' + chit_id + 'PASS: Image loaded');
+    //     return (
+    //       <Image
+    //         resizeMode="cover"
+    //         source={{
+    //           uri:
+    //             'http://10.0.2.2:3333/api/v0.0.5/chits/' + chit_id + '/photo',
+    //         }}
+    //         style={styles.chitImage}
+    //       />
+    //     );
+    //   } else {
+    //     console.log(response.status + ' ' + chit_id + ' FAIL: Not loaded');
+    //     return <Text style={styles.title}>Not found</Text>;
+    //   }
+    // });
   };
 
   // Draw UI
@@ -111,34 +124,44 @@ class GetChits extends Component {
           style={styles.chitMargin}
           data={this.state.chitList}
           renderItem={({item}) => (
-            <TouchableHighlight
-              onPress={() =>
-                // When pressed open chit window
-                navigate('ChitScreen', {
-                  user_id: item.user.user_id,
-                  chit_id: item.chit_id,
-                  chit_content: item.chit_content,
-                  longitude: item.location.longitude,
-                  latitude: item.location.latitude,
-                })
-              }>
+            <Card
+              containerStyle={styles.chitContainer}
+              titleStyle={styles.title}
+              title={
+                <View style={styles.nameContainer}>
+                  <Text style={styles.title}>
+                    {item.user.given_name} {item.user.family_name}
+                  </Text>
+                  <View style={styles.timestampContainer} />
+                  <Text style={styles.timestamp}>
+                    {new Date(item.timestamp).toLocaleString()}
+                  </Text>
+                </View>
+              }
+              imageProps={{
+                // containerStyle: styles.chitImage,
+                placeholderStyle: styles.chitHideImage,
+                PlaceholderContent: (
+                  <View>
+                    <ActivityIndicator />
+                  </View>
+                ),
+              }}
+              image={{
+                uri:
+                  'http://10.0.2.2:3333/api/v0.0.5/chits/' +
+                  item.chit_id +
+                  '/photo',
+              }}>
               <Text style={styles.chitContent}>
-                <Text style={styles.chitName}>
-                  {item.user.given_name} {item.user.family_name}
-                  {'\n'}
-                  {'\n'}
-                </Text>
                 <Text>
                   {item.chit_content}
                   {'\n'}
                   {'\n'}
                 </Text>
-                <Text style={styles.timestamp}>
-                  Sent on {new Date(item.timestamp).toLocaleString()}
-                </Text>
                 {'\n'}
                 {item.location == undefined ? (
-                  (item.location = 'No Location')
+                  (item.location = 'No Location Provided')
                 ) : (
                   <Text style={styles.timestamp}>
                     {'Location: ' +
@@ -147,18 +170,9 @@ class GetChits extends Component {
                       item.location.longitude}
                   </Text>
                 )}
-                {'\n'}
-                <Image
-                  source={{
-                    uri:
-                      'http://10.0.2.2:3333/api/v0.0.5/chits/' +
-                      item.chit_id +
-                      '/photo',
-                  }}
-                  style={styles.chitImage}
-                />
               </Text>
-            </TouchableHighlight>
+              {this.renderImage(item.chit_id)}
+            </Card>
           )}
           keyExtractor={({chit_id}, primarykey) => chit_id.toString()}
         />
@@ -174,7 +188,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#17202b',
     color: '#ffffff',
   },
-  chitContent: {
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 15,
+  },
+  nameContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  timestampContainer: {flexGrow: 1},
+  timestamp: {
+    fontSize: 14,
+    color: '#ffffff',
+  },
+  chitContainer: {
     margin: 1,
     padding: 20,
     borderRadius: 3,
@@ -182,6 +211,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     backgroundColor: '#1b2734',
     elevation: 2,
+    fontSize: 14,
+    color: '#ffffff',
+  },
+  chitContent: {
     fontSize: 14,
     color: '#ffffff',
   },
@@ -194,10 +227,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   chitImage: {
-    width: 350,
-    height: 200,
-    backgroundColor: 'white',
+    width: 320,
+    height: 240,
   },
+  chitHideImage: {},
 });
 
 export default GetChits;
