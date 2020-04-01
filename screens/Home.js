@@ -107,7 +107,6 @@ class GetChits extends Component {
 
   // Draw UI
   render() {
-    const {navigate} = this.props.navigation;
     if (this.state.isLoading) {
       // Show loading wheel if data isn't loaded yet
       return (

@@ -17,17 +17,13 @@ class GetChits extends Component {
     super(props);
     this.state = {
       isLoading: true,
-      chitList: [],
+      draftList: [],
       user_id: '',
       x_auth: '',
-      given_name: '',
-      family_name: '',
       chit_content: '',
-      longitude: '',
-      latitude: '',
     };
   }
-  async retrieveAccount() {
+  async retrieveAsync() {
     try {
       // Retreieve from Async Storage
       const user_id = await AsyncStorage.getItem('user_id');
@@ -49,10 +45,10 @@ class GetChits extends Component {
     // Refresh chits when tab is navigated to
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.getData();
-      this.retrieveAccount();
+      this.retrieveAsync();
     });
     this.getData();
-    this.retrieveAccount();
+    this.retrieveAsync();
   }
 
   getData() {
@@ -77,37 +73,8 @@ class GetChits extends Component {
     });
   };
 
-  // Attempt at removing unloaded images from chit
-  renderImage = chit_id => {
-    // // Build JSON request
-    // fetch('http://10.0.2.2:3333/api/v0.0.5/chits' + chit_id + '/photo').then(
-    //   response => {
-    //     // Check for 404
-    //     // console.log(response);
-    //     console.log(response);
-    //     if (response !== null) {
-    //       console.log(response.status + ' ' + chit_id + ' PASS: Image loaded');
-    //       return (
-    //         <Image
-    //           resizeMode="cover"
-    //           source={{
-    //             uri:
-    //               'http://10.0.2.2:3333/api/v0.0.5/chits/' + chit_id + '/photo',
-    //           }}
-    //           style={styles.chitImage}
-    //         />
-    //       );
-    //     } else {
-    //       console.log(response.status + ' ' + chit_id + ' FAIL: Not loaded');
-    //       return <Text style={styles.title}>Not found</Text>;
-    //     }
-    //   },
-    // );
-  };
-
   // Draw UI
   render() {
-    const {navigate} = this.props.navigation;
     if (this.state.isLoading) {
       // Show loading wheel if data isn't loaded yet
       return (
@@ -122,55 +89,14 @@ class GetChits extends Component {
           style={styles.chitMargin}
           data={this.state.chitList}
           renderItem={({item}) => (
-            <Card
-              containerStyle={styles.chitContainer}
-              titleStyle={styles.title}
-              title={
-                <View style={styles.nameContainer}>
-                  <Text style={styles.title}>
-                    {item.user.given_name} {item.user.family_name}
-                  </Text>
-                  <View style={styles.timestampContainer} />
-                  <Text style={styles.timestamp}>
-                    {new Date(item.timestamp).toLocaleString()}
-                  </Text>
-                </View>
-              }
-              imageProps={{
-                resizeMode: 'cover',
-                // containerStyle: styles.chitImage,
-                placeholderStyle: styles.chitHideImage,
-                PlaceholderContent: (
-                  <View>
-                    <ActivityIndicator />
-                  </View>
-                ),
-              }}
-              image={{
-                uri:
-                  'http://10.0.2.2:3333/api/v0.0.5/chits/' +
-                  item.chit_id +
-                  '/photo',
-              }}>
+            <Card containerStyle={styles.chitContainer}>
               <Text style={styles.chitContent}>
                 <Text>
                   {item.chit_content}
                   {'\n'}
-                  {'\n'}
                 </Text>
                 {'\n'}
-                {item.location == undefined ? (
-                  (item.location = 'No Location Provided')
-                ) : (
-                  <Text style={styles.timestamp}>
-                    {'Location: ' +
-                      item.location.latitude +
-                      ', ' +
-                      item.location.longitude}
-                  </Text>
-                )}
               </Text>
-              {this.renderImage(item.chit_id)}
             </Card>
           )}
           keyExtractor={({chit_id}, primarykey) => chit_id.toString()}
