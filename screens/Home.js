@@ -70,13 +70,6 @@ class GetChits extends Component {
       });
   }
 
-  // Update chit content
-  setContent = text => {
-    this.setState({
-      chit_content: text,
-    });
-  };
-
   // Attempt at removing unloaded images from chit
   renderImage = chit_id => {
     // // Build JSON request
@@ -120,6 +113,7 @@ class GetChits extends Component {
         <FlatList
           style={styles.chitMargin}
           data={this.state.chitList}
+          keyExtractor={({chit_id}) => chit_id.toString()}
           renderItem={({item}) => (
             <Card
               containerStyle={styles.chitContainer}
@@ -172,7 +166,6 @@ class GetChits extends Component {
               {this.renderImage(item.chit_id)}
             </Card>
           )}
-          keyExtractor={({chit_id}, primarykey) => chit_id.toString()}
         />
       </View>
     );

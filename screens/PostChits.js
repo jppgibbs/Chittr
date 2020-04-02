@@ -167,7 +167,7 @@ class PostChits extends Component {
         console.error('Chit failed to post: ' + error);
       }
     } else {
-      Alert.alert('Cannot post blank chit');
+      Alert.alert('Talk chit first!', 'Cannot post blank chit');
       console.log('Debug: Rejected posting blank chit');
     }
   }
@@ -180,36 +180,48 @@ class PostChits extends Component {
   }
 
   async saveDraft() {
-    try {
-      let tempDraft = await AsyncStorage.getItem('chit_draft');
+    if (this.state.chit_content !== '') {
+      try {
+        let chit_draft = await AsyncStorage.getItem('chit_draft');
 
-      if (tempDraft !== null) {
-        let draftParsed = JSON.parse(tempDraft);
-        await AsyncStorage.removeItem('chit_draft');
-        const newChit = [
-          {
-            chit_content: this.state.chit_content,
-          },
-        ];
-        let draftCombined = draftParsed.concat(newChit);
-        await AsyncStorage.setItem('chit_draft', JSON.stringify(draftCombined));
-      } else {
-        // If tempDraft is empty then create a new array to store drafts in
-        const draft = [
-          // Set the value of the array to match what is currently in the text box
-          {
-            chit_content: this.state.chit_content,
-          },
-        ];
-        await AsyncStorage.setItem('chit_draft', JSON.stringify(draft));
+        if (chit_draft !== null) {
+          let draftParsed = JSON.parse(chit_draft);
+          await AsyncStorage.removeItem('chit_draft');
+
+          const newChit = [
+            {
+              chit_content: this.state.chit_content,
+            },
+          ];
+
+          let draftCombined = draftParsed.concat(newChit);
+          await AsyncStorage.setItem(
+            'chit_draft',
+            JSON.stringify(draftCombined),
+          );
+        } else {
+          // If tempDraft is empty then create a new array to store drafts in
+          const draft = [
+            // Set the value of the array to match what is currently in the text box
+            {
+              chit_content: this.state.chit_content,
+            },
+          ];
+          await AsyncStorage.setItem('chit_draft', JSON.stringify(draft));
+        }
+        console.log(
+          'Draft list updated: ' + (await AsyncStorage.getItem('chit_draft')),
+        );
+      } catch (error) {
+        console.log('Failed to update draft list: ' + error.message);
       }
-      console.log('Draft list updated: ' + updatedList);
-      let updatedList = await AsyncStorage.getItem('chit_draft');
-    } catch (error) {
-      console.log('Failed to update draft list: ' + error.message);
+    } else {
+      Alert.alert('Talk chit first!', 'Cannot save blank chit to drafts');
+      console.log('(Drafts): Rejected saving blank chit to drafts');
     }
   }
   // this.props.navigation.navigate('My Drafts');
+  
 
   render() {
     // TODO: Visible character limit counter

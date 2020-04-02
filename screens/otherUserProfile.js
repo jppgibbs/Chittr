@@ -203,11 +203,11 @@ class viewOtherProfile extends Component {
     }
   }
 
-  // Modal Overlay
+  // Followers Overlay
   setFollowersVisible(visible) {
     this.setState({modalVisible: visible});
   }
-  // Modal Overlay
+  // Following Overlay
   setFollowingVisible(visible) {
     this.setState({modalVisible2: visible});
   }
