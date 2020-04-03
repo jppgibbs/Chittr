@@ -5,24 +5,21 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import Login from './screens/Login.js';
 import Register from './screens/Register.js';
-
 import Home from './screens/Home.js';
 import PostChits from './screens/PostChits.js';
 import Profile from './screens/UserProfile.js';
 import ViewProfile from './screens/ViewProfile.js';
 import EditProfile from './screens/EditProfile.js';
-
 import Camera from './screens/Camera.js';
-
 import SearchUserScreen from './screens/SearchUser.js';
-import OtherUserProfile from './screens/otherUserProfile.js';
+import ViewOtherProfile from './screens/otherUserProfile.js';
 import ChangeProfilePic from './screens/ChangePictureScreen.js';
 import Drafts from './screens/Drafts.js';
 
-//const Tab = createBottomTabNavigator();
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+// Create a tab navigator for each of the 4 primary tabs
 function App() {
   return (
     <NavigationContainer>
@@ -42,26 +39,7 @@ function App() {
   );
 }
 
-function Account() {
-  return (
-    <Stack.Navigator
-      initialRouteName="Home"
-      headerMode="screen"
-      screenOptions={{
-        headerTintColor: 'white',
-        headerTitleStyle: {color: 'white'},
-        headerStyle: {backgroundColor: '#182633'},
-      }}>
-      <Stack.Screen name="Account" component={Profile} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Register" component={Register} />
-      <Stack.Screen name="View Profile" component={ViewProfile} />
-      <Stack.Screen name="Edit Profile" component={EditProfile} />
-      <Stack.Screen name="Change Profile Pic" component={ChangeProfilePic} />
-    </Stack.Navigator>
-  );
-}
-
+// Post stack navigation nested inside tab navigation
 function Post() {
   return (
     <Stack.Navigator
@@ -79,6 +57,7 @@ function Post() {
   );
 }
 
+// Search stack navigation nested inside tab navigation
 function Search() {
   return (
     <Stack.Navigator
@@ -90,7 +69,28 @@ function Search() {
         headerStyle: {backgroundColor: '#182633'},
       }}>
       <Stack.Screen name="Search Users" component={SearchUserScreen} />
-      <Stack.Screen name="Viewing Profile" component={OtherUserProfile} />
+      <Stack.Screen name="Viewing Profile" component={ViewOtherProfile} />
+    </Stack.Navigator>
+  );
+}
+
+// Account stack navigation nested inside tab navigation
+function Account() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Profile"
+      headerMode="screen"
+      screenOptions={{
+        headerTintColor: 'white',
+        headerTitleStyle: {color: 'white'},
+        headerStyle: {backgroundColor: '#182633'},
+      }}>
+      <Stack.Screen name="Account" component={Profile} />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Register" component={Register} />
+      <Stack.Screen name="View Profile" component={ViewProfile} />
+      <Stack.Screen name="Edit Profile" component={EditProfile} />
+      <Stack.Screen name="Change Profile Pic" component={ChangeProfilePic} />
     </Stack.Navigator>
   );
 }

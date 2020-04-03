@@ -6,12 +6,10 @@ import {
   Text,
   View,
   StyleSheet,
-  ImagePlaceholder,
-  TouchableHighlight,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {Card, Image, ListItem, Button, Icon} from 'react-native-elements';
-
+import {Card} from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 class GetChits extends Component {
   constructor(props) {
     super(props);
@@ -163,7 +161,7 @@ class GetChits extends Component {
                   </Text>
                 )}
               </Text>
-              {this.renderImage(item.chit_id)}
+              {/* {this.renderImage(item.chit_id)} */}
             </Card>
           )}
         />

@@ -221,7 +221,6 @@ class PostChits extends Component {
     }
   }
   // this.props.navigation.navigate('My Drafts');
-  
 
   render() {
     // TODO: Visible character limit counter

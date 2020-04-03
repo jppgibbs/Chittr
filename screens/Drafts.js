@@ -15,8 +15,9 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from 'react-native-geolocation-service';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {Card, Image, ListItem, Button, Divider} from 'react-native-elements';
-import DialogInput from 'react-native-dialog-input';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import BackgroundTimer from 'react-native-background-timer';
+import DatePicker from 'react-native-datepicker';
+
 import Modal from 'react-native-modal';
 
 // Check if user has location permissions, if not, prompt to allow it
@@ -56,6 +57,9 @@ class Drafts extends Component {
       array_index: 0,
       modalVisible: false,
       isDialogVisible: false,
+      isScheduleDialogVisible: false,
+      setShow: false,
+      date: '',
     };
   }
 
@@ -71,6 +75,7 @@ class Drafts extends Component {
     });
     this.retrieveAsync();
     this.findCoordinates();
+    var date = Date.parse(new Date());
   }
 
   // Retrieve account data and drafts from Async storage
@@ -111,6 +116,7 @@ class Drafts extends Component {
   //       EDITING / DELETING DRAFTS
   // #######################################
 
+  // Edit Draft in the Array
   async editDraft() {
     var drafts = this.state.draftList;
     drafts[this.state.array_index].chit_content = this.state.current_draft;
@@ -122,6 +128,7 @@ class Drafts extends Component {
     );
   }
 
+  // Delete Draft in the Array
   async createDeleteDraftArray(index) {
     var drafts = this.state.draftList;
     console.log(index);
@@ -222,25 +229,30 @@ class Drafts extends Component {
   //           SCHEDULING DRAFTS
   // #######################################
 
-  setTimePicker(visible) {
-    this.setState({setShow: true});
-  }
+  scheduleChit() {}
+
   // #######################################
   //              Interface
   // #######################################
 
+  // Control edit modal visibility
   setDialogVisible(visible) {
     this.setState({isDialogVisible: visible});
   }
 
+  // List Index
   setIndexAccessed(index) {
     this.setState({array_index: index});
+  }
+
+  // Show/Hide scheduler
+  setTimePicker(visible) {
+    this.setState({isScheduleDialogVisible: visible});
   }
 
   // Draw UI
   render() {
     console.log('(Drafts) Current Listed Drafts: ' + this.state.draftList);
-    let timestamp = Date.parse(new Date());
     return (
       <View style={styles.mainView}>
         <FlatList
@@ -258,7 +270,7 @@ class Drafts extends Component {
                   buttonStyle={styles.button}
                   title="POST"
                   type="outline"
-                  onPress={() => this.postDraft(item.chit_content)}
+                  onPress={() => this.postDraft(item.chit_content)} // delete draft when posted??
                 />
                 <Button
                   buttonStyle={styles.button}
@@ -281,15 +293,17 @@ class Drafts extends Component {
                   buttonStyle={styles.button}
                   title="SCHEDULE"
                   type="outline"
+                  onPress={() => {
+                    this.setTimePicker(!this.state.isScheduleDialogVisible);
+                  }}
                 />
               </View>
               <Modal
-                //animationType="slide"
+                animationType="slide"
                 visible={this.state.isDialogVisible}
                 testID={'modal'}
-                //isVisible={this.isVisible()}
                 backdropColor="#B4B3DB"
-                backdropOpacity={0.8}
+                backdropOpacity={0.2}
                 animationIn="zoomInDown"
                 animationOut="zoomOutUp"
                 animationInTiming={600}
@@ -311,17 +325,59 @@ class Drafts extends Component {
                   />
                   <Text style={styles.bodyText}>141 character limit</Text>
                   <Button
-                    buttonStyle={styles.button2}
+                    buttonStyle={styles.buttonModal}
                     testID={'edit-chit'}
                     onPress={() => this.editDraft()}
                     title="Edit Chit"
                   />
-
                   <Button
-                    buttonStyle={styles.button2}
+                    buttonStyle={styles.buttonModal}
                     testID={'close-button'}
                     onPress={() => {
                       this.setDialogVisible(!this.state.isDialogVisible);
+                    }}
+                    title="Close"
+                  />
+                </View>
+              </Modal>
+              <Modal
+                animationType="slide"
+                visible={this.state.isScheduleDialogVisible}
+                testID={'Schedule-Modal'}
+                backdropColor="#B4B3DB"
+                backdropOpacity={0.2}
+                animationIn="zoomInDown"
+                animationOut="zoomOutUp"
+                animationInTiming={600}
+                animationOutTiming={600}
+                backdropTransitionInTiming={600}
+                backdropTransitionOutTiming={600}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.title}>Schedule Draft</Text>
+                  <DatePicker
+                    buttonStyle={styles.dateTimePicker}
+                    style={styles.dateTimePicker}
+                    date={this.state.date}
+                    mode="time" // Limited to time only, modify to allow date scheduling
+                    placeholder="Pick a time"
+                    format="DD-MM-YYYY HH-mm"
+                    onDateChange={date => {
+                      this.setState({date: date});
+                    }}
+                  />
+                  <Button
+                    buttonStyle={styles.buttonModal}
+                    testID={'schedule-button'}
+                    onPress={() => {
+                      this.scheduleChit();
+                    }}
+                    title="Schedule"
+                  />
+                  <Button
+                    buttonStyle={styles.buttonModal}
+                    testID={'close-button'}
+                    onPress={() => {
+                      this.setTimePicker(!this.state.isScheduleDialogVisible);
                     }}
                     title="Close"
                   />
@@ -341,7 +397,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#17202b',
     color: '#ffffff',
   },
-
   title: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -357,7 +412,6 @@ const styles = StyleSheet.create({
     margin: 1,
     padding: 20,
   },
-
   chitContainer: {
     // Card container style
     margin: 1,
@@ -372,19 +426,15 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
   },
-
   chitContent: {},
-
   buttonContainer: {
     flexDirection: 'row',
     flex: 3,
   },
-
   button: {
     padding: 5,
     marginHorizontal: 7,
   },
-
   textEntry: {
     alignItems: 'center',
     padding: 5,
@@ -400,22 +450,16 @@ const styles = StyleSheet.create({
     marginRight: 15,
     height: 80,
   },
-  button2: {
+  buttonModal: {
     alignItems: 'center',
-    elevation: 2,
     padding: 10,
     marginTop: 5,
-    marginBottom: 0,
-    borderColor: '#101010',
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: '#2296f3',
     marginLeft: 15,
     marginRight: 15,
   },
   modalContent: {
     backgroundColor: '#006494',
-    padding: 22,
+    padding: 5,
     justifyContent: 'center',
     borderRadius: 4,
     borderColor: 'rgba(0, 0, 0, 0.1)',
@@ -424,6 +468,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'white',
     marginBottom: 12,
+  },
+  dateTimePicker: {
+    width: 300,
+    alignSelf: 'center',
+    color: '#ffffff',
   },
 });
 
