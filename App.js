@@ -3,19 +3,20 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import Login from './screens/Login.js';
-import Register from './screens/Register.js';
+// Import each of the screens used in navigation
 import Home from './screens/Home.js';
 import PostChits from './screens/PostChits.js';
+import Login from './screens/Login.js';
+import Register from './screens/Register.js';
 import Profile from './screens/UserProfile.js';
-import ViewProfile from './screens/ViewProfile.js';
 import EditProfile from './screens/EditProfile.js';
 import Camera from './screens/Camera.js';
 import SearchUserScreen from './screens/SearchUser.js';
-import ViewOtherProfile from './screens/otherUserProfile.js';
+import ViewOtherProfile from './screens/ViewProfile.js';
 import ChangeProfilePic from './screens/ChangePictureScreen.js';
 import Drafts from './screens/Drafts.js';
 
+// Define both of our navigation styles
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -88,7 +89,6 @@ function Account() {
       <Stack.Screen name="Account" component={Profile} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
-      <Stack.Screen name="View Profile" component={ViewProfile} />
       <Stack.Screen name="Edit Profile" component={EditProfile} />
       <Stack.Screen name="Change Profile Pic" component={ChangeProfilePic} />
     </Stack.Navigator>

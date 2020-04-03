@@ -1,34 +1,41 @@
 import React, {Component} from 'react';
 import {
   Text,
-  TextInput,
   View,
   Alert,
-  Button,
   StyleSheet,
   TouchableOpacity,
   Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {Avatar} from 'react-native-elements';
 
-class UserProfile extends Component {
+/*
+## Account Screen
+- If the user is not logged in this screen displays buttons to navigate to the create
+account and login screens.
+- If the user is logged in, this screen displays the user's information and profile picture,
+along with the ability to edit their details, profile picture or logout.
+*/
+
+class Account extends Component {
   // Construct variables with default empty values
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
-      password: '',
-      given_name: '',
-      family_name: '',
       user_id: '',
       x_auth: '',
       profileData: [],
-      profilePicture: null,
     };
   }
 
-  async retrieveAccount() {
+  componentDidMount() {
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.retrieveAsync();
+    });
+    this.retrieveAsync();
+  }
+
+  async retrieveAsync() {
     try {
       // Retreieve from Async Storage
       let user_id = await AsyncStorage.getItem('user_id');
@@ -79,7 +86,7 @@ class UserProfile extends Component {
       await AsyncStorage.removeItem('x_auth');
       await AsyncStorage.removeItem('user_id');
       console.log('Cleared account information from async');
-      this.retrieveAccount();
+      this.retrieveAsync();
     } catch (error) {
       console.log('Removing auth key failed: ' + error);
     }
@@ -104,12 +111,7 @@ class UserProfile extends Component {
       });
   };
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.retrieveAccount();
-    });
-    this.retrieveAccount();
-  }
+
 
   render() {
     if (this.state.user_id !== null) {
@@ -138,11 +140,6 @@ class UserProfile extends Component {
           </Text>
           <Text style={styles.title}>Account</Text>
           <Text style={styles.bodyText}>Navigate your account settings:</Text>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('View Profile')}
-            style={styles.button}>
-            <Text style={styles.bodyText}>View Profile</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => this.props.navigation.navigate('Edit Profile')}
             style={styles.button}>
@@ -256,4 +253,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserProfile;
+export default Account;

@@ -9,6 +9,11 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
+/*
+## Login Screen
+- This screen allows the user to log in to an account
+*/
+
 class Login extends Component {
   // Construct variables with default empty values
   constructor(props) {
@@ -16,7 +21,6 @@ class Login extends Component {
     this.state = {
       email: '',
       password: '',
-      loggedIn: false,
       user_id: '',
       x_auth: '',
     };
@@ -41,10 +45,12 @@ class Login extends Component {
 
       console.log('xauth: ' + x_auth);
     } catch (error) {
-      console.log('Failed to store token. ' + error);
+      console.log('Failed to store auth token ' + error);
     }
   }
-  async retrieveAccount() {
+
+  // Retrieve account data from Async storage
+  async retrieveAsync() {
     try {
       // Retreieve from Async Storage
       const user_id = await AsyncStorage.getItem('user_id');
@@ -96,27 +102,27 @@ class Login extends Component {
           this.storeUser();
           this.storeToken();
           Alert.alert('Login', 'Successfully Logged in');
-          this.retrieveAccount();
+          this.retrieveAsync();
           this.props.navigation.navigate('Account');
         })
         // If the login fails
         .catch(error => {
           console.log('Debug: Login error: \n' + error);
           Alert.alert('Login Failed', 'Please check your login details');
-          this.setState({
-            loggedIn: false,
-          });
         })
     );
   };
 
   render() {
     return (
-      <View style={styles.mainView} accessible={true}>
-        <Text style={styles.title} accessibilityRole="text">
+      <View style={styles.primaryView} accessible={true}>
+        <Text style={styles.title} accessible={true} accessibilityRole="text">
           Login
         </Text>
-        <Text style={styles.bodyText} accessibilityRole="text">
+        <Text
+          style={styles.bodyText}
+          accessible={true}
+          accessibilityRole="text">
           Email Address
         </Text>
         <TextInput
@@ -127,6 +133,7 @@ class Login extends Component {
           placeholderTextColor="#918f8a"
           placeholder="example@example.com"
           textContentType="emailAddress"
+          accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="Enter email"
@@ -143,6 +150,7 @@ class Login extends Component {
           placeholder="Password"
           defaultValue="test"
           secureTextEntry
+          accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="Enter password"
@@ -152,18 +160,20 @@ class Login extends Component {
         <TouchableOpacity
           onPress={() => this.login()}
           style={styles.button}
+          accessible={true}
           accessibilityComponentType="button"
           accessibilityRole="button"
           accessibilityLabel="Log in"
           accessibilityHint="Press this to confirm your details and log into your account">
           <Text style={styles.bodyText}>Log In</Text>
         </TouchableOpacity>
-        <Text style={styles.title} accessibilityRole="text">
+        <Text style={styles.title} accessible={true} accessibilityRole="text">
           Don't have an account?
         </Text>
         <TouchableOpacity
           onPress={() => this.props.navigation.navigate('Register')}
           style={styles.button}
+          accessible={true}
           accessibilityComponentType="button"
           accessibilityRole="button"
           accessibilityLabel="Register"
@@ -177,8 +187,9 @@ class Login extends Component {
   }
 }
 
+// Stylesheet
 const styles = StyleSheet.create({
-  mainView: {
+  primaryView: {
     justifyContent: 'center',
     flex: 1,
     flexDirection: 'column',

@@ -4,14 +4,16 @@ import {
   TextInput,
   View,
   Alert,
-  Button,
-  FlatList,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 
-class CreateAccount extends Component {
+/*
+## Edit Profile Screen
+- Allows the user to create a new account using the details they enter
+*/
+
+class Register extends Component {
   // Construct variables with default empty values
   constructor(props) {
     super(props);
@@ -21,23 +23,23 @@ class CreateAccount extends Component {
       email: '',
       password: '',
       user_id: '',
-      validation: '',
     };
   }
 
+  // Use the items in the text box to post a new account
   createAccount() {
-    let res1 = JSON.stringify({
+    let bodyContent = JSON.stringify({
       given_name: this.state.given_name,
       family_name: this.state.family_name,
       email: this.state.email,
       password: this.state.password,
     });
 
-    console.log(res1);
+    console.log(bodyContent);
 
     return fetch('http://10.0.2.2:3333/api/v0.0.5/user', {
       method: 'POST',
-      body: res1,
+      body: bodyContent,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -60,11 +62,14 @@ class CreateAccount extends Component {
 
   render() {
     return (
-      <View style={styles.viewStyle} accessible={true}>
-        <Text style={styles.title} accessibilityRole="text">
+      <View style={styles.primaryView} accessible={true}>
+        <Text style={styles.title} accessible={true} accessibilityRole="text">
           Create Account
         </Text>
-        <Text style={styles.bodyText} accessibilityRole="text">
+        <Text
+          style={styles.bodyText}
+          accessible={true}
+          accessibilityRole="text">
           First Name
         </Text>
         <TextInput
@@ -73,6 +78,7 @@ class CreateAccount extends Component {
           value={this.state.given_name}
           placeholderTextColor="#918f8a"
           placeholder="John"
+          accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="First Name"
@@ -87,6 +93,7 @@ class CreateAccount extends Component {
           value={this.state.family_name}
           placeholderTextColor="#918f8a"
           placeholder="Smith"
+          accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="Second Name"
@@ -102,6 +109,7 @@ class CreateAccount extends Component {
           textContentType="emailAddress"
           placeholderTextColor="#918f8a"
           placeholder="example@example.com"
+          accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="Enter email"
@@ -117,6 +125,7 @@ class CreateAccount extends Component {
           secureTextEntry
           placeholderTextColor="#918f8a"
           placeholder="Password"
+          accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="Enter password"
@@ -124,8 +133,16 @@ class CreateAccount extends Component {
         />
         <TouchableOpacity
           onPress={() => this.createAccount()}
-          style={styles.button}>
-          <Text style={styles.bodyText} accessibilityRole="text">
+          style={styles.button}
+          accessible={true}
+          accessibilityComponentType="button"
+          accessibilityRole="button"
+          accessibilityLabel="Create Account"
+          accessibilityHint="Press this to create your account">
+          <Text
+            style={styles.bodyText}
+            accessible={true}
+            accessibilityRole="text">
             Create Account
           </Text>
         </TouchableOpacity>
@@ -134,8 +151,9 @@ class CreateAccount extends Component {
   }
 }
 
+// Stylesheet
 const styles = StyleSheet.create({
-  viewStyle: {
+  primaryView: {
     justifyContent: 'center',
     flex: 1,
     backgroundColor: '#17202b',
@@ -183,4 +201,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateAccount;
+export default Register;

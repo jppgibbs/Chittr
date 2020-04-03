@@ -4,14 +4,17 @@ import {
   TextInput,
   View,
   Alert,
-  Button,
-  FlatList,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-class EditAccount extends Component {
+/*
+## Edit Profile Screen
+- Allows the user to edit the details of their account
+*/
+
+class EditProfile extends Component {
   // Construct variables with default empty values
   constructor(props) {
     super(props);
@@ -21,17 +24,19 @@ class EditAccount extends Component {
       email: '',
       password: '',
       user_id: '',
-      validation: '',
     };
   }
+
+  // Run whenever the component is first loaded
   componentDidMount() {
-    // Refresh chits when tab is navigated to
+    // Run when this tab is navigated to to refresh account info
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.retrieveAccount();
+      this.retrieveAsync();
     });
-    this.retrieveAccount();
+    this.retrieveAsync();
   }
-  async retrieveAccount() {
+
+  async retrieveAsync() {
     try {
       // Retreieve from Async Storage
       const user_id = await AsyncStorage.getItem('user_id');
@@ -54,20 +59,20 @@ class EditAccount extends Component {
       console.error(e);
     }
   }
-
+  // Post changes to the server
   editAccount() {
-    let res1 = JSON.stringify({
+    let bodyContent = JSON.stringify({
       given_name: this.state.given_name,
       family_name: this.state.family_name,
       email: this.state.email,
       password: this.state.password,
     });
 
-    console.log(res1);
+    console.log(bodyContent);
     let headerAuth = JSON.parse(this.state.x_auth);
     return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.user_id, {
       method: 'PATCH',
-      body: res1,
+      body: bodyContent,
       headers: {
         'Content-Type': 'application/json',
         'X-Authorization': headerAuth,
@@ -88,11 +93,14 @@ class EditAccount extends Component {
 
   render() {
     return (
-      <View style={styles.viewStyle} accessible={true}>
-        <Text style={styles.title} accessibilityRole="text">
+      <View style={styles.primaryView} accessible={true}>
+        <Text style={styles.title} accessible={true} accessibilityRole="text">
           Edit Account
         </Text>
-        <Text style={styles.bodyText} accessibilityRole="text">
+        <Text
+          style={styles.bodyText}
+          accessible={true}
+          accessibilityRole="text">
           First Name
         </Text>
         <TextInput
@@ -101,6 +109,7 @@ class EditAccount extends Component {
           value={this.state.given_name}
           placeholderTextColor="#918f8a"
           placeholder="John"
+          accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="First Name"
@@ -115,6 +124,7 @@ class EditAccount extends Component {
           value={this.state.family_name}
           placeholderTextColor="#918f8a"
           placeholder="Smith"
+          accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="Second Name"
@@ -130,6 +140,7 @@ class EditAccount extends Component {
           textContentType="emailAddress"
           placeholderTextColor="#918f8a"
           placeholder="example@example.com"
+          accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="Enter email"
@@ -145,6 +156,7 @@ class EditAccount extends Component {
           secureTextEntry
           placeholderTextColor="#918f8a"
           placeholder="Password"
+          accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="Enter password"
@@ -152,7 +164,12 @@ class EditAccount extends Component {
         />
         <TouchableOpacity
           onPress={() => this.editAccount()}
-          style={styles.button}>
+          style={styles.button}
+          accessible={true}
+          accessibilityComponentType="button"
+          accessibilityRole="button"
+          accessibilityLabel="Edit Account"
+          accessibilityHint="Press this to edit your account">
           <Text style={styles.bodyText} accessibilityRole="text">
             Submit Changes
           </Text>
@@ -162,8 +179,9 @@ class EditAccount extends Component {
   }
 }
 
+// Stylesheet
 const styles = StyleSheet.create({
-  viewStyle: {
+  primaryView: {
     justifyContent: 'center',
     flex: 1,
     backgroundColor: '#17202b',
@@ -211,4 +229,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditAccount;
+export default EditProfile;

@@ -2,9 +2,14 @@ import React, {Component} from 'react';
 import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {RNCamera} from 'react-native-camera';
-//import {TouchableOpacity} from 'react-native-gesture-handler';
 
-class AddChitPhoto extends Component {
+/*
+## Camera Screen (Add Photo to Chit)
+- This screen will be navigated to when the user chooses to add a photo to a chit
+- It allows the user to take a photo and will append it to their chit
+*/
+
+class Camera extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,16 +21,17 @@ class AddChitPhoto extends Component {
   // Get account info from async on first load and every subsequent navigation
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.retrieveAccount();
+      this.retrieveAsync();
     });
-    this.retrieveAccount();
+    this.retrieveAsync();
   }
   // Function loads the user ID and the x-auth token from async storage and stores in state.
-  async retrieveAccount() {
+  async retrieveAsync() {
     try {
       // Retreieve from Async Storage
       const user_id = await AsyncStorage.getItem('user_id');
       const x_auth = await AsyncStorage.getItem('x_auth');
+      // We need to get the id of the chit from async so we know which one to post the image to
       const chit_id = await AsyncStorage.getItem('chit_id');
 
       // Parse into JSON
@@ -47,9 +53,11 @@ class AddChitPhoto extends Component {
     } catch (e) {
       console.error(e);
     }
+    // Get the user's most recent chits only after we have fully loaded their account
     this.getMostRecentChit;
   }
 
+  // Find the chit the user posted (required to navigate to this screen) to add the photo to it
   getMostRecentChit() {
     return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.user_id)
       .then(response => response.json())
@@ -65,6 +73,7 @@ class AddChitPhoto extends Component {
       });
   }
 
+  // Use the camera to take a photo when the button is pressed and post it to the server
   takePhoto = async () => {
     await this.getMostRecentChit();
     let chit_id = this.state.chit_id;
@@ -82,7 +91,7 @@ class AddChitPhoto extends Component {
       },
     )
       .then(response => {
-        this.props.navigation.goBack();
+        this.props.navigation.navigate('Home');
         console.log('Photo taken');
       })
       .catch(error => {
@@ -92,7 +101,7 @@ class AddChitPhoto extends Component {
 
   render() {
     return (
-      <View style={styles.primaryView}>
+      <View style={styles.primaryView} accessible={true}>
         <RNCamera
           captureAudio={false}
           style={styles.cameraFrame}
@@ -102,14 +111,22 @@ class AddChitPhoto extends Component {
         />
         <TouchableOpacity
           onPress={this.takePhoto.bind(this)}
-          style={styles.button}>
-          <Text style={styles.title}>Take Picture</Text>
+          style={styles.button}
+          accessible={true}
+          accessibilityComponentType="button"
+          accessibilityRole="button"
+          accessibilityLabel="Take photo"
+          accessibilityHint="Press this to add the photo to your chit">
+          <Text style={styles.title} accessible={true} accessibilityRole="text">
+            Take Picture
+          </Text>
         </TouchableOpacity>
       </View>
     );
   }
 }
 
+// Stylesheet
 const styles = StyleSheet.create({
   primaryView: {
     flex: 1,
@@ -133,4 +150,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddChitPhoto;
+export default Camera;

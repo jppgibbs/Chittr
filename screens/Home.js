@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-
 import {
   FlatList,
   ActivityIndicator,
@@ -9,8 +8,16 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Card} from 'react-native-elements';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-class GetChits extends Component {
+
+/*
+## Home Screen
+- This will be the first page the user lands on when they open the app.
+- It displays all chits from accounts the user is following, sorting most recent first.
+
+TODO: if an image cannot be found in a chit then hide the image container
+*/
+
+class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -18,20 +25,27 @@ class GetChits extends Component {
       chitList: [],
       user_id: '',
       x_auth: '',
-      given_name: '',
-      family_name: '',
-      chit_content: '',
-      longitude: '',
-      latitude: '',
     };
   }
-  async retrieveAccount() {
+  // Run whenever the component is first loaded
+  componentDidMount() {
+    // Run when this tab is navigated to to refresh chits and any new account info
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.getData();
+      this.retrieveAsync();
+    });
+    this.getData();
+    this.retrieveAsync();
+  }
+
+  // Retrieve account data from Async storage
+  async retrieveAsync() {
     try {
       // Retreieve from Async Storage
       const user_id = await AsyncStorage.getItem('user_id');
       const x_auth = await AsyncStorage.getItem('x_auth');
 
-      // Parse into JSON
+      // Parse output into JSON
       const user_id_json = await JSON.parse(user_id);
       const x_auth_json = await JSON.parse(x_auth);
       this.setState({
@@ -39,62 +53,54 @@ class GetChits extends Component {
         user_id: user_id_json,
       });
     } catch (e) {
-      console.error(e);
+      console.error('(Home) Error retrieving from async: ' + e);
     }
   }
 
-  componentDidMount() {
-    // Refresh chits when tab is navigated to
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.getData();
-      this.retrieveAccount();
-    });
-    this.getData();
-    this.retrieveAccount();
-  }
-
+  // Retrieve chits from the database
   getData() {
-    // Connect to mudfoot server and retreieve data
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=5')
+    // Connect to mudfoot server and retrieve data (start={Index to start from}; count={Number of chits to display})
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=50')
       .then(response => response.json())
       .then(responseJson => {
+        // Once we have a JSON response stop displaying placeholder and update the chit list
         this.setState({
           isLoading: false,
           chitList: responseJson,
         });
       })
       .catch(error => {
-        console.log('Debug: error retreiving chits:' + error);
+        console.log('(Home) Error retreiving chits:' + error);
       });
   }
 
-  // Attempt at removing unloaded images from chit
-  renderImage = chit_id => {
-    // // Build JSON request
-    // fetch('http://10.0.2.2:3333/api/v0.0.5/chits' + chit_id + '/photo').then(
-    //   response => {
-    //     // Check for 404
-    //     // console.log(response);
-    //     console.log(response);
-    //     if (response !== null) {
-    //       console.log(response.status + ' ' + chit_id + ' PASS: Image loaded');
-    //       return (
-    //         <Image
-    //           resizeMode="cover"
-    //           source={{
-    //             uri:
-    //               'http://10.0.2.2:3333/api/v0.0.5/chits/' + chit_id + '/photo',
-    //           }}
-    //           style={styles.chitImage}
-    //         />
-    //       );
-    //     } else {
-    //       console.log(response.status + ' ' + chit_id + ' FAIL: Not loaded');
-    //       return <Text style={styles.title}>Not found</Text>;
-    //     }
-    //   },
-    // );
-  };
+  // ## Attempt at removing image container from chits without an image
+  // renderImage = chit_id => {
+  // // Build JSON request
+  // fetch('http://10.0.2.2:3333/api/v0.0.5/chits' + chit_id + '/photo').then(
+  //   response => {
+  //     // Check for 404
+  //     // console.log(response);
+  //     console.log(response);
+  //     if (response !== null) {
+  //       console.log(response.status + ' ' + chit_id + ' PASS: Image loaded');
+  //       return (
+  //         <Image
+  //           resizeMode="cover"
+  //           source={{
+  //             uri:
+  //               'http://10.0.2.2:3333/api/v0.0.5/chits/' + chit_id + '/photo',
+  //           }}
+  //           style={styles.chitImage}
+  //         />
+  //       );
+  //     } else {
+  //       console.log(response.status + ' ' + chit_id + ' FAIL: Not loaded');
+  //       return <Text style={styles.title}>Not found</Text>;
+  //     }
+  //   },
+  // );
+  // };
 
   // Draw UI
   render() {
@@ -107,22 +113,31 @@ class GetChits extends Component {
       );
     }
     return (
-      <View style={styles.mainView}>
+      <View style={styles.backgroundView} accessible={true}>
         <FlatList
+          // Create list to store individual chit cards inside
           style={styles.chitMargin}
           data={this.state.chitList}
           keyExtractor={({chit_id}) => chit_id.toString()}
           renderItem={({item}) => (
             <Card
+              // Create chit cards to store chit content
+              accessible={true}
               containerStyle={styles.chitContainer}
               titleStyle={styles.title}
               title={
                 <View style={styles.nameContainer}>
-                  <Text style={styles.title}>
+                  <Text
+                    style={styles.title}
+                    accessible={true}
+                    accessibilityRole="text">
                     {item.user.given_name} {item.user.family_name}
                   </Text>
                   <View style={styles.timestampContainer} />
-                  <Text style={styles.timestamp}>
+                  <Text
+                    style={styles.timestamp}
+                    accessible={true}
+                    accessibilityRole="text">
                     {new Date(item.timestamp).toLocaleString()}
                   </Text>
                 </View>
@@ -143,8 +158,11 @@ class GetChits extends Component {
                   item.chit_id +
                   '/photo',
               }}>
-              <Text style={styles.chitContent}>
-                <Text>
+              <Text
+                style={styles.chitContent}
+                accessible={true}
+                accessibilityRole="text">
+                <Text accessible={true} accessibilityRole="text">
                   {item.chit_content}
                   {'\n'}
                   {'\n'}
@@ -153,7 +171,10 @@ class GetChits extends Component {
                 {item.location == undefined ? (
                   (item.location = 'No Location Provided')
                 ) : (
-                  <Text style={styles.timestamp}>
+                  <Text
+                    style={styles.timestamp}
+                    accessible={true}
+                    accessibilityRole="text">
                     {'Location: ' +
                       item.location.latitude +
                       ', ' +
@@ -170,8 +191,9 @@ class GetChits extends Component {
   }
 }
 
+// Stylesheet
 const styles = StyleSheet.create({
-  mainView: {
+  backgroundView: {
     flex: 1,
     flexDirection: 'column',
     backgroundColor: '#17202b',
@@ -200,8 +222,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     backgroundColor: '#1b2734',
     elevation: 2,
-    fontSize: 14,
-    color: '#ffffff',
   },
   chitContent: {
     fontSize: 14,
@@ -222,4 +242,4 @@ const styles = StyleSheet.create({
   chitHideImage: {},
 });
 
-export default GetChits;
+export default Home;

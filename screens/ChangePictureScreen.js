@@ -56,7 +56,7 @@ class EditProfilePic extends Component {
       },
     })
       .then(response => {
-        this.props.navigation.goBack();
+        this.props.navigation.navigate('Account');
         console.log('Photo taken');
       })
       .catch(error => {

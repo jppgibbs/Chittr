@@ -11,6 +11,14 @@ import {
 import Geolocation from 'react-native-geolocation-service';
 import AsyncStorage from '@react-native-community/async-storage';
 
+/*
+## Post Chits Screen
+- Allows a logged in user to post a chit (With geolocation & timestamp)
+- User can use the 'Post Chit and Photo' button to add a photo to their chit
+- User can press the save draft button to save what they currently have written to the drafts list
+*/
+
+// Location permission prompt
 async function requestLocationPermission() {
   try {
     const granted = await PermissionsAndroid.request(
@@ -42,16 +50,21 @@ class PostChits extends Component {
       user_id: '',
       x_auth: '',
       chit_content: '',
-      lat: null,
-      long: null,
-      location: null,
       locationPermission: false,
-      geotag: false,
-      modalVisible: false,
     };
   }
+  // Run whenever the component is first loaded
+  componentDidMount() {
+    // Run when this tab is navigated to to refresh location and any new account info
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.retrieveAsync();
+    });
+    this.retrieveAsync();
+    this.findCoordinates();
+  }
+
   // Retrieve and parse user id and corresponding auth key from async storage
-  async retrieveAccount() {
+  async retrieveAsync() {
     try {
       // Retreieve from Async Storage
       const user_id = await AsyncStorage.getItem('user_id');
@@ -74,27 +87,10 @@ class PostChits extends Component {
       console.error(e);
     }
   }
-  // Prompt user to log in if they have no auth
-  async validate() {
-    let x_auth_check = await AsyncStorage.getItem('x_auth');
-    if (x_auth_check !== null) {
-      console.log('Logged in');
-      this.setState({validation: 'true'});
-    } else {
-      console.log('Not logged in');
-      this.setState({validation: 'false'});
-    }
-  }
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.retrieveAccount();
-    });
-    this.retrieveAccount();
-    this.findCoordinates();
-  }
-
+  // Get the user's current geolocation
   findCoordinates = () => {
+    // If location permission is not already granted, prompt for it
     if (!this.state.locationPermission) {
       this.state.locationPermission = requestLocationPermission();
     }
@@ -106,7 +102,6 @@ class PostChits extends Component {
           longitude: longitude,
           latitude: latitude,
         });
-        console.log('Debug: Found location: ' + longitude + latitude);
       },
       error => {
         Alert.alert(error.message);
@@ -121,7 +116,7 @@ class PostChits extends Component {
 
   // When Post Chit button is pressed
   postChit() {
-    this.retrieveAccount();
+    this.retrieveAsync();
     // Get current date and parse it
     var timestamp = Date.parse(new Date());
     // Format our request
@@ -152,11 +147,10 @@ class PostChits extends Component {
             console.log(response);
             // Check if response is unauthorized to give user feedback
             if (response.status !== 401) {
-              Alert.alert('Posted Chit!');
               console.log('Chit successfully posted');
               //this.props.navigation.navigate('Home');
             } else {
-              Alert.alert('Failed to post. Please log in.');
+              Alert.alert('Failed to post.', 'Please log in.');
               console.log('Chit failed to post');
             }
           })
@@ -172,35 +166,34 @@ class PostChits extends Component {
     }
   }
 
+  // Post chit then allow the user to take a picture to add to it
   postChitWithPhoto() {
-    // TODO: Improve this to not show alerts (add nav to home to camera)
-    // TODO: Make it so photo doesn't get added to latest chit if one didn't post
     this.postChit();
     this.props.navigation.navigate('Camera');
   }
 
+  // Save draft button
   async saveDraft() {
+    // Only run if the current chit text is not blank
     if (this.state.chit_content !== '') {
       try {
         let chit_draft = await AsyncStorage.getItem('chit_draft');
-
+        // Check if there is already a stored draft arra
         if (chit_draft !== null) {
           let draftParsed = JSON.parse(chit_draft);
           await AsyncStorage.removeItem('chit_draft');
-
           const newChit = [
             {
               chit_content: this.state.chit_content,
             },
           ];
-
           let draftCombined = draftParsed.concat(newChit);
           await AsyncStorage.setItem(
             'chit_draft',
             JSON.stringify(draftCombined),
           );
         } else {
-          // If tempDraft is empty then create a new array to store drafts in
+          // If chit_draft is empty then create a new array to store drafts in
           const draft = [
             // Set the value of the array to match what is currently in the text box
             {
@@ -220,15 +213,15 @@ class PostChits extends Component {
       console.log('(Drafts): Rejected saving blank chit to drafts');
     }
   }
-  // this.props.navigation.navigate('My Drafts');
 
   render() {
-    // TODO: Visible character limit counter
     return (
-      <View style={styles.mainView}>
-        <Text style={styles.title}>Talk Chit:</Text>
+      <View style={styles.primaryView} accessible={true}>
+        <Text style={styles.title} accessible={true} accessibilityRole="text">
+          Talk Chit:
+        </Text>
         <TextInput
-          style={styles.textEntry}
+          style={styles.composeChit}
           placeholderTextColor="#918f8a"
           placeholder="Howl into the meaningless void known as Chittr"
           autoCapitalize="sentences"
@@ -236,40 +229,91 @@ class PostChits extends Component {
           numberOfLines={4}
           maxLength={141}
           onChangeText={text => this.setState({chit_content: text})}
+          accessible={true}
+          accessibilityLabel="Write your chit"
+          accessibilityHint="Type out your chit here"
         />
-        <Text style={styles.bodyText}>141 character limit</Text>
-        <TouchableOpacity onPress={() => this.postChit()} style={styles.button}>
-          <Text style={styles.bodyText}>Post Chit</Text>
+        <Text
+          style={styles.bodyText}
+          accessible={true}
+          accessibilityRole="text">
+          141 character limit
+        </Text>
+        <TouchableOpacity
+          onPress={() => this.postChit()}
+          style={styles.button}
+          accessible={true}
+          accessibilityComponentType="button"
+          accessibilityRole="button"
+          accessibilityLabel="Create Account"
+          accessibilityHint="Press this to create your account">
+          <Text
+            style={styles.bodyText}
+            accessible={true}
+            accessibilityRole="text">
+            Post Chit
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          // onPress={() => this.props.navigation.navigate('Camera')}
           onPress={() => this.postChitWithPhoto()}
-          style={styles.button}>
-          <Text style={styles.bodyText}>Add Photo</Text>
+          style={styles.button}
+          accessible={true}
+          accessibilityComponentType="button"
+          accessibilityRole="button"
+          accessibilityLabel="Create Account"
+          accessibilityHint="Press this to create your account">
+          <Text
+            style={styles.bodyText}
+            accessible={true}
+            accessibilityRole="text">
+            Post Chit and Photo
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => this.saveDraft()}
-          style={styles.button}>
-          <Text style={styles.bodyText}>Save Draft</Text>
+          style={styles.button}
+          accessible={true}
+          accessibilityComponentType="button"
+          accessibilityRole="button"
+          accessibilityLabel="Create Account"
+          accessibilityHint="Press this to create your account">
+          <Text
+            style={styles.bodyText}
+            accessible={true}
+            accessibilityRole="text">
+            Save Draft
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => this.props.navigation.navigate('My Drafts')}
-          style={styles.button}>
-          <Text style={styles.bodyText}>View Drafts</Text>
+          style={styles.button}
+          accessible={true}
+          accessibilityComponentType="button"
+          accessibilityRole="button"
+          accessibilityLabel="Create Account"
+          accessibilityHint="Press this to create your account">
+          <Text
+            style={styles.bodyText}
+            accessible={true}
+            accessibilityRole="text">
+            View Drafts
+          </Text>
         </TouchableOpacity>
       </View>
     );
   }
 }
+
+// Stylesheet
 const styles = StyleSheet.create({
-  mainView: {
+  primaryView: {
     flex: 1,
     flexDirection: 'column',
     backgroundColor: '#17202b',
     color: '#ffffff',
     justifyContent: 'center',
   },
-  textEntry: {
+  composeChit: {
     alignItems: 'center',
     padding: 5,
     color: '#ffffff',
