@@ -51,6 +51,7 @@ class PostChits extends Component {
       x_auth: '',
       chit_content: '',
       locationPermission: false,
+      numChar: 141,
     };
   }
   // Run whenever the component is first loaded

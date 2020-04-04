@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import {Input, Button, ThemeConsumer} from 'react-native-elements';
 
 /*
 ## Edit Profile Screen
@@ -24,6 +26,7 @@ class EditProfile extends Component {
       email: '',
       password: '',
       user_id: '',
+      profileData: [],
     };
   }
 
@@ -58,7 +61,30 @@ class EditProfile extends Component {
     } catch (e) {
       console.error(e);
     }
+    this.getProfileData();
   }
+
+  // Get account data from the server
+  getProfileData() {
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.user_id, {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState(
+          {
+            profileData: responseJson,
+          },
+          () => {
+            console.log('(UserProfile): Account retrieved profile async');
+          },
+        );
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
   // Post changes to the server
   editAccount() {
     let bodyContent = JSON.stringify({
@@ -103,12 +129,13 @@ class EditProfile extends Component {
           accessibilityRole="text">
           First Name
         </Text>
-        <TextInput
-          style={styles.textEntry}
+        <Input
+          inputStyle={styles.textEntry}
           onChangeText={text => this.setState({given_name: text})}
           value={this.state.given_name}
           placeholderTextColor="#918f8a"
-          placeholder="John"
+          placeholder={this.state.profileData.given_name}
+          leftIcon={<Icon name="signature" size={24} color="white" />}
           accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
@@ -118,12 +145,13 @@ class EditProfile extends Component {
         <Text style={styles.bodyText} accessibilityRole="text">
           Second Name
         </Text>
-        <TextInput
-          style={styles.textEntry}
+        <Input
+          inputStyle={styles.textEntry}
           onChangeText={text => this.setState({family_name: text})}
           value={this.state.family_name}
           placeholderTextColor="#918f8a"
-          placeholder="Smith"
+          placeholder={this.state.profileData.family_name}
+          leftIcon={<Icon name="user" size={24} color="white" />}
           accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
@@ -133,13 +161,14 @@ class EditProfile extends Component {
         <Text style={styles.bodyText} accessibilityRole="text">
           Email
         </Text>
-        <TextInput
-          style={styles.textEntry}
+        <Input
+          inputStyle={styles.textEntry}
           onChangeText={text => this.setState({email: text})}
           value={this.state.email}
           textContentType="emailAddress"
           placeholderTextColor="#918f8a"
-          placeholder="example@example.com"
+          placeholder={this.state.profileData.email}
+          leftIcon={<Icon name="envelope" size={24} color="white" />}
           accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
@@ -149,31 +178,30 @@ class EditProfile extends Component {
         <Text style={styles.bodyText} accessibilityRole="text">
           Password
         </Text>
-        <TextInput
-          style={styles.textEntry}
+        <Input
+          inputStyle={styles.textEntry}
           onChangeText={text => this.setState({password: text})}
           value={this.state.password}
           secureTextEntry
           placeholderTextColor="#918f8a"
-          placeholder="Password"
+          placeholder="  Password"
+          leftIcon={<Icon name="lock" size={24} color="white" />}
           accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="Enter password"
           accessibilityHint="Enter the password you wish to use for your account"
         />
-        <TouchableOpacity
-          onPress={() => this.editAccount()}
-          style={styles.button}
+        <Button
+          onPress={() => this.createAccount()}
+          buttonStyle={styles.button}
+          title="Submit Changes"
           accessible={true}
           accessibilityComponentType="button"
           accessibilityRole="button"
-          accessibilityLabel="Edit Account"
-          accessibilityHint="Press this to edit your account">
-          <Text style={styles.bodyText} accessibilityRole="text">
-            Submit Changes
-          </Text>
-        </TouchableOpacity>
+          accessibilityLabel="Submit Changes"
+          accessibilityHint="Press this to edit your account"
+        />
       </View>
     );
   }
@@ -188,31 +216,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   button: {
-    alignItems: 'center',
-    elevation: 2,
-    padding: 10,
-    marginTop: 5,
+    marginTop: 10,
     marginBottom: 0,
     marginLeft: 15,
     marginRight: 15,
-    borderColor: '#101010',
-    borderWidth: 1,
-    borderRadius: 2,
-    backgroundColor: '#2296f3',
   },
   textEntry: {
-    alignItems: 'center',
-    padding: 5,
     color: '#ffffff',
-    marginTop: 5,
-    marginBottom: 0,
-    borderColor: '#2296f3',
-    borderRadius: 2,
-    borderWidth: 1,
-    backgroundColor: '#273341',
-    elevation: 3,
-    marginLeft: 15,
-    marginRight: 15,
   },
   title: {
     fontSize: 18,

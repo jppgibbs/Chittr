@@ -326,14 +326,6 @@ class viewOtherProfile extends Component {
                   />
                 )}
               />
-
-              <Button
-                testID={'close-button'}
-                onPress={() => {
-                  this.setFollowersVisible(!this.state.followerOverlayVisible);
-                }}
-                title="Close"
-              />
             </View>
           }
         />
@@ -390,13 +382,6 @@ class viewOtherProfile extends Component {
                   />
                 )}
               />
-              {/* <Button
-                testID={'close-button'}
-                onPress={() => {
-                  this.setFollowingVisible(!this.state.followingOverlayVisible);
-                }}
-                title="Close"
-              /> */}
             </View>
           }
         />
