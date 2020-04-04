@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {Card} from 'react-native-elements';
+import {Card, Avatar} from 'react-native-elements';
 
 /*
 ## Home Screen
@@ -127,6 +127,17 @@ class Home extends Component {
               titleStyle={styles.title}
               title={
                 <View style={styles.nameContainer}>
+                  <Avatar
+                    rounded
+                    containerStyle={styles.avatarContainer}
+                    source={{
+                      uri:
+                        'http://10.0.2.2:3333/api/v0.0.5/user/' +
+                        item.user.user_id +
+                        '/photo?timestamp=' +
+                        Date.now(),
+                    }}
+                  />
                   <Text
                     style={styles.title}
                     accessible={true}
@@ -202,16 +213,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#ffffff',
+    marginTop: 5,
+  },
+  avatarContainer: {
+    marginRight: 10,
     marginBottom: 15,
   },
   nameContainer: {
     display: 'flex',
     flexDirection: 'row',
+    justifyContent: 'space-evenly',
   },
   timestampContainer: {flexGrow: 1},
   timestamp: {
     fontSize: 14,
     color: '#ffffff',
+    marginTop: 7,
   },
   chitContainer: {
     margin: 1,

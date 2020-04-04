@@ -1,15 +1,7 @@
 import React, {Component} from 'react';
-import {
-  Text,
-  View,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  FlatList,
-} from 'react-native';
+import {Text, View, Alert, StyleSheet, Image, FlatList} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import Modal from 'react-native-modal';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import {ListItem, Button, Overlay} from 'react-native-elements';
 
 class viewOtherProfile extends Component {
@@ -17,19 +9,11 @@ class viewOtherProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
-      password: '',
-      given_name: '',
-      family_name: '',
-      user_id: '',
-      view_user_id: '',
-      x_auth: '',
       profileData: [],
       followerList: [],
       followingList: [],
-      modalVisible: false,
-      modalVisible2: false,
-      following: false,
+      followerOverlayVisible: false,
+      followingOverlayVisible: false,
     };
   }
 
@@ -202,11 +186,11 @@ class viewOtherProfile extends Component {
 
   // Followers Overlay
   setFollowersVisible(visible) {
-    this.setState({modalVisible: visible});
+    this.setState({followerOverlayVisible: visible});
   }
   // Following Overlay
   setFollowingVisible(visible) {
-    this.setState({modalVisible2: visible});
+    this.setState({followingOverlayVisible: visible});
   }
 
   render() {
@@ -231,119 +215,191 @@ class viewOtherProfile extends Component {
         <Text style={styles.detailText}>
           Account ID: {this.state.profileData.user_id}
         </Text>
-        <TouchableOpacity onPress={() => this.follow()} style={styles.button}>
-          <Text style={styles.bodyText}>Follow</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => this.unfollow()} style={styles.button}>
-          <Text style={styles.bodyText}>Unfollow</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.setFollowersVisible()}
-          style={styles.button}>
-          <Text style={styles.bodyText}>View Followers</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.setFollowingVisible()}
-          style={styles.button}>
-          <Text style={styles.bodyText}>View Following</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonGridContainer}>
+          <Button
+            title="Follow"
+            onPress={() => this.follow()}
+            buttonStyle={styles.buttonSquare}
+            icon={
+              <Icon
+                name="user-plus"
+                size={15}
+                color="white"
+                style={styles.buttonIcon}
+              />
+            }
+          />
+          <Button
+            title="Unfollow"
+            onPress={() => this.unfollow()}
+            buttonStyle={styles.buttonSquare}
+            icon={
+              <Icon
+                name="user-minus"
+                size={15}
+                color="white"
+                style={styles.buttonIcon}
+              />
+            }
+          />
+          <Button
+            title="Followers"
+            onPress={() =>
+              this.setFollowersVisible(!this.state.followerOverlayVisible)
+            }
+            buttonStyle={styles.buttonSquare}
+            icon={
+              <Icon
+                name="users"
+                size={15}
+                color="white"
+                style={styles.buttonIcon}
+              />
+            }
+          />
+          <Button
+            title="Following"
+            onPress={() =>
+              this.setFollowingVisible(!this.state.followingOverlayVisible)
+            }
+            buttonStyle={styles.buttonSquare}
+            icon={
+              <Icon
+                name="user-friends"
+                size={15}
+                color="white"
+                style={styles.buttonIcon}
+              />
+            }
+          />
+        </View>
         <Overlay
-          //animationType="slide"
-          // visible={this.state.modalVisible}
+          animationType="slide"
           testID={'modal'}
-          isVisible={this.state.modalVisible}
+          isVisible={this.state.followerOverlayVisible}
           backdropColor="#B4B3DB"
           backdropOpacity={0.8}
           animationIn="zoomInDown"
           animationOut="zoomOutUp"
           animationInTiming={600}
           animationOutTiming={600}
+          overlayStyle={styles.modalContent}
           backdropTransitionInTiming={600}
-          backdropTransitionOutTiming={600}>
-          <View style={styles.modalContent}>
-            <Text style={styles.title}>Followers</Text>
-            <FlatList
-              data={this.state.followerList}
-              keyExtractor={({user_id}) => user_id.toString()}
-              renderItem={({item}) => (
-                <ListItem
-                  containerStyle={styles.listItem}
-                  title={item.given_name + ' ' + item.family_name}
-                  subtitle={item.email}
-                  titleStyle={styles.listItemTitle}
-                  subtitleStyle={styles.listItemSubtitle}
-                  leftAvatar={{
-                    source: {
-                      uri:
-                        'http://10.0.2.2:3333/api/v0.0.5/user/' +
-                        item.user_id +
-                        '/photo?timestamp=' +
-                        Date.now(),
-                    },
-                  }}
-                  bottomDivider
-                  chevron={{color: 'white'}}
-                />
-              )}
-            />
+          backdropTransitionOutTiming={600}
+          onBackdropPress={() =>
+            this.setFollowersVisible(!this.state.followerOverlayVisible)
+          }
+          children={
+            <View>
+              <FlatList
+                style={styles.list}
+                ListHeaderComponent={
+                  <Text style={styles.title}>
+                    <Icon
+                      name="users"
+                      size={15}
+                      color="white"
+                      style={styles.buttonIcon}
+                    />
+                    &nbsp; Followers
+                  </Text>
+                }
+                data={this.state.followerList}
+                keyExtractor={({user_id}) => user_id.toString()}
+                renderItem={({item}) => (
+                  <ListItem
+                    containerStyle={styles.listItem}
+                    title={item.given_name + ' ' + item.family_name}
+                    subtitle={item.email}
+                    titleStyle={styles.listItemTitle}
+                    subtitleStyle={styles.listItemSubtitle}
+                    leftAvatar={{
+                      source: {
+                        uri:
+                          'http://10.0.2.2:3333/api/v0.0.5/user/' +
+                          item.user_id +
+                          '/photo?timestamp=' +
+                          Date.now(),
+                      },
+                    }}
+                    chevron={{color: 'white'}}
+                  />
+                )}
+              />
 
-            <Button
-              testID={'close-button'}
-              onPress={() => {
-                this.setFollowersVisible(!this.state.modalVisible);
-              }}
-              title="Close"
-            />
-          </View>
-        </Overlay>
-        <Modal
-          //animationType="slide"
-          visible={this.state.modalVisible2}
+              <Button
+                testID={'close-button'}
+                onPress={() => {
+                  this.setFollowersVisible(!this.state.followerOverlayVisible);
+                }}
+                title="Close"
+              />
+            </View>
+          }
+        />
+        <Overlay
+          animationType="slide"
           testID={'modal'}
-          //isVisible={this.isVisible()}
+          isVisible={this.state.followingOverlayVisible}
           backdropColor="#B4B3DB"
           backdropOpacity={0.8}
           animationIn="zoomInDown"
           animationOut="zoomOutUp"
           animationInTiming={600}
           animationOutTiming={600}
+          overlayStyle={styles.modalContent}
           backdropTransitionInTiming={600}
-          backdropTransitionOutTiming={600}>
-          <View style={styles.modalContent}>
-            <Text style={styles.title}>Following</Text>
-            <FlatList
-              data={this.state.followingList}
-              keyExtractor={({user_id}) => user_id.toString()}
-              renderItem={({item}) => (
-                <ListItem
-                  containerStyle={styles.listItem}
-                  title={item.given_name + ' ' + item.family_name}
-                  subtitle={item.email}
-                  titleStyle={styles.listItemTitle}
-                  subtitleStyle={styles.listItemSubtitle}
-                  leftAvatar={{
-                    source: {
-                      uri:
-                        'http://10.0.2.2:3333/api/v0.0.5/user/' +
-                        item.user_id +
-                        '/photo?timestamp=' +
-                        Date.now(),
-                    },
-                  }}
-                  bottomDivider
-                  chevron={{color: 'white'}}
-                />
-              )}
-            />
-            <Button
-              testID={'close-button'}
-              onPress={() => {
-                this.setFollowingVisible(!this.state.modalVisible2);
-              }}
-              title="Close"
-            />
-          </View>
-        </Modal>
+          backdropTransitionOutTiming={600}
+          onBackdropPress={() =>
+            this.setFollowingVisible(!this.state.followingOverlayVisible)
+          }
+          children={
+            <View>
+              <FlatList
+                ListHeaderComponent={
+                  <Text style={styles.title}>
+                    <Icon
+                      name="user-friends"
+                      size={15}
+                      color="white"
+                      style={styles.buttonIcon}
+                    />
+                    &nbsp; Following
+                  </Text>
+                }
+                data={this.state.followingList}
+                keyExtractor={({user_id}) => user_id.toString()}
+                renderItem={({item}) => (
+                  <ListItem
+                    containerStyle={styles.listItem}
+                    title={item.given_name + ' ' + item.family_name}
+                    subtitle={item.email}
+                    titleStyle={styles.listItemTitle}
+                    subtitleStyle={styles.listItemSubtitle}
+                    leftAvatar={{
+                      source: {
+                        uri:
+                          'http://10.0.2.2:3333/api/v0.0.5/user/' +
+                          item.user_id +
+                          '/photo?timestamp=' +
+                          Date.now(),
+                      },
+                    }}
+                    bottomDivider
+                    chevron={{color: 'white'}}
+                  />
+                )}
+              />
+              {/* <Button
+                testID={'close-button'}
+                onPress={() => {
+                  this.setFollowingVisible(!this.state.followingOverlayVisible);
+                }}
+                title="Close"
+              /> */}
+            </View>
+          }
+        />
       </View>
     );
   }
@@ -366,7 +422,37 @@ const styles = StyleSheet.create({
   },
   listItemTitle: {color: 'white', fontWeight: 'bold'},
   listItemSubtitle: {color: 'white'},
-  button: {
+  buttonGridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginTop: 25,
+  },
+  buttonSquare: {
+    height: 100,
+    width: 150,
+    alignItems: 'center',
+    elevation: 2,
+    padding: 10,
+    borderColor: '#101010',
+    borderWidth: 1,
+    borderRadius: 2,
+    backgroundColor: '#2296f3',
+    marginVertical: 3,
+    marginHorizontal: 3,
+  },
+  buttonIcon: {
+    marginRight: 10,
+  },
+  profilePic: {
+    width: 150,
+    height: 150,
+    alignSelf: 'center',
+    borderRadius: 100,
+    marginBottom: 15,
+    backgroundColor: 'white',
+  },
+  button_o: {
     alignItems: 'center',
     elevation: 2,
     padding: 10,
@@ -379,21 +465,12 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     marginRight: 15,
   },
-  profilePic: {
-    width: 150,
-    height: 150,
-    alignSelf: 'center',
-    borderRadius: 100,
-    marginBottom: 15,
-    backgroundColor: 'white',
-  },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#ffffff',
     marginLeft: 15,
     marginRight: 15,
-    marginBottom: 5,
   },
   bodyText: {
     color: '#ffffff',
@@ -413,11 +490,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   modalContent: {
-    backgroundColor: '#006494',
-    padding: 22,
+    backgroundColor: '#17202b',
     justifyContent: 'center',
-    borderRadius: 4,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
   },
   modalContentTitle: {
     fontSize: 20,
@@ -425,22 +499,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   list: {
-    padding: 10,
-    borderRadius: 3,
-    borderColor: '#3a444d',
-    backgroundColor: '#17202b',
-    elevation: 2,
-    marginTop: 10,
-    marginBottom: 10,
-    marginHorizontal: 15,
+    marginVertical: 5,
   },
   listItem: {
-    margin: 1,
-    borderRadius: 3,
-    borderColor: '#3a444d',
-    borderWidth: 2,
     backgroundColor: '#1b2734',
-    elevation: 2,
+    marginHorizontal: 5,
   },
 });
 

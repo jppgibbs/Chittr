@@ -1,12 +1,7 @@
 import React, {Component} from 'react';
-import {
-  Text,
-  TextInput,
-  View,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {Text, View, Alert, StyleSheet, TouchableOpacity} from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import {Input, Button} from 'react-native-elements';
 
 /*
 ## Edit Profile Screen
@@ -72,12 +67,13 @@ class Register extends Component {
           accessibilityRole="text">
           First Name
         </Text>
-        <TextInput
-          style={styles.textEntry}
+        <Input
+          inputStyle={styles.textEntry}
           onChangeText={text => this.setState({given_name: text})}
           value={this.state.given_name}
           placeholderTextColor="#918f8a"
           placeholder="John"
+          leftIcon={<Icon name="signature" size={24} color="white" />}
           accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
@@ -87,12 +83,13 @@ class Register extends Component {
         <Text style={styles.bodyText} accessibilityRole="text">
           Second Name
         </Text>
-        <TextInput
-          style={styles.textEntry}
+        <Input
+          inputStyle={styles.textEntry}
           onChangeText={text => this.setState({family_name: text})}
           value={this.state.family_name}
           placeholderTextColor="#918f8a"
-          placeholder="Smith"
+          placeholder="  Smith"
+          leftIcon={<Icon name="user" size={24} color="white" />}
           accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
@@ -102,13 +99,14 @@ class Register extends Component {
         <Text style={styles.bodyText} accessibilityRole="text">
           Email
         </Text>
-        <TextInput
-          style={styles.textEntry}
+        <Input
+          inputStyle={styles.textEntry}
           onChangeText={text => this.setState({email: text})}
           value={this.state.email}
           textContentType="emailAddress"
           placeholderTextColor="#918f8a"
-          placeholder="example@example.com"
+          placeholder="  example@example.com"
+          leftIcon={<Icon name="envelope" size={24} color="white" />}
           accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
@@ -118,34 +116,30 @@ class Register extends Component {
         <Text style={styles.bodyText} accessibilityRole="text">
           Password
         </Text>
-        <TextInput
-          style={styles.textEntry}
+        <Input
+          inputStyle={styles.textEntry}
           onChangeText={text => this.setState({password: text})}
           value={this.state.password}
           secureTextEntry
           placeholderTextColor="#918f8a"
-          placeholder="Password"
+          placeholder="  Password"
+          leftIcon={<Icon name="lock" size={24} color="white" />}
           accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
           accessibilityLabel="Enter password"
           accessibilityHint="Enter the password you wish to use for your account"
         />
-        <TouchableOpacity
+        <Button
           onPress={() => this.createAccount()}
-          style={styles.button}
+          buttonStyle={styles.button}
+          title="Create Account"
           accessible={true}
           accessibilityComponentType="button"
           accessibilityRole="button"
           accessibilityLabel="Create Account"
-          accessibilityHint="Press this to create your account">
-          <Text
-            style={styles.bodyText}
-            accessible={true}
-            accessibilityRole="text">
-            Create Account
-          </Text>
-        </TouchableOpacity>
+          accessibilityHint="Press this to create your account"
+        />
       </View>
     );
   }
@@ -160,31 +154,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   button: {
-    alignItems: 'center',
-    elevation: 2,
-    padding: 10,
-    marginTop: 5,
+    marginTop: 10,
     marginBottom: 0,
     marginLeft: 15,
     marginRight: 15,
-    borderColor: '#101010',
-    borderWidth: 1,
-    borderRadius: 2,
-    backgroundColor: '#2296f3',
   },
   textEntry: {
-    alignItems: 'center',
-    padding: 5,
     color: '#ffffff',
-    marginTop: 5,
-    marginBottom: 0,
-    borderColor: '#2296f3',
-    borderRadius: 2,
-    borderWidth: 1,
-    backgroundColor: '#273341',
-    elevation: 3,
-    marginLeft: 15,
-    marginRight: 15,
   },
   title: {
     fontSize: 18,

@@ -1,14 +1,8 @@
 import React, {Component} from 'react';
-import {
-  Text,
-  TextInput,
-  View,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {Text, View, Alert, StyleSheet} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import {Input, Button} from 'react-native-elements';
 /*
 ## Login Screen
 - This screen allows the user to log in to an account
@@ -125,14 +119,14 @@ class Login extends Component {
           accessibilityRole="text">
           Email Address
         </Text>
-        <TextInput
-          style={styles.textEntry}
+        <Input
+          inputStyle={styles.textEntry}
           onChangeText={text => this.setState({email: text})}
           value={this.state.email}
-          defaultValue="test@test.com"
           placeholderTextColor="#918f8a"
-          placeholder="example@example.com"
+          placeholder="  example@example.com"
           textContentType="emailAddress"
+          leftIcon={<Icon name="envelope" size={24} color="white" />}
           accessible={true}
           accessibilityComponentType="none"
           accessibilityRole="none"
@@ -142,12 +136,13 @@ class Login extends Component {
         <Text style={styles.bodyText} accessibilityRole="text">
           Password
         </Text>
-        <TextInput
-          style={styles.textEntry}
+        <Input
+          inputStyle={styles.textEntry}
           onChangeText={text => this.setState({password: text})}
           value={this.state.password}
+          leftIcon={<Icon name="lock" size={24} color="white" />}
           placeholderTextColor="#918f8a"
-          placeholder="Password"
+          placeholder="  Password"
           defaultValue="test"
           secureTextEntry
           accessible={true}
@@ -157,31 +152,30 @@ class Login extends Component {
           accessibilityHint="Enter the password for the account you wish to login to"
         />
 
-        <TouchableOpacity
+        <Button
           onPress={() => this.login()}
-          style={styles.button}
+          title="Login"
+          buttonStyle={styles.button}
           accessible={true}
           accessibilityComponentType="button"
           accessibilityRole="button"
           accessibilityLabel="Log in"
-          accessibilityHint="Press this to confirm your details and log into your account">
-          <Text style={styles.bodyText}>Log In</Text>
-        </TouchableOpacity>
+          accessibilityHint="Press this to confirm your details and log into your account"
+        />
         <Text style={styles.title} accessible={true} accessibilityRole="text">
           Don't have an account?
         </Text>
-        <TouchableOpacity
+        <Button
+          title="Register"
+          buttonStyle={styles.button}
           onPress={() => this.props.navigation.navigate('Register')}
           style={styles.button}
           accessible={true}
           accessibilityComponentType="button"
           accessibilityRole="button"
           accessibilityLabel="Register"
-          accessibilityHint="Register a new account">
-          <Text style={styles.bodyText} accessibilityRole="text">
-            Create Account
-          </Text>
-        </TouchableOpacity>
+          accessibilityHint="Register a new account"
+        />
       </View>
     );
   }
@@ -198,30 +192,13 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    elevation: 2,
-    padding: 10,
     marginTop: 5,
     marginBottom: 0,
-    borderColor: '#101010',
-    borderWidth: 1,
-    borderRadius: 2,
-    backgroundColor: '#2296f3',
     marginLeft: 15,
     marginRight: 15,
   },
   textEntry: {
-    alignItems: 'center',
-    padding: 5,
     color: '#ffffff',
-    marginTop: 5,
-    marginBottom: 0,
-    borderColor: '#2296f3',
-    borderRadius: 2,
-    borderWidth: 1,
-    backgroundColor: '#273341',
-    elevation: 3,
-    marginLeft: 15,
-    marginRight: 15,
   },
   title: {
     fontSize: 18,

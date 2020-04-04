@@ -2,6 +2,7 @@ import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 // Import each of the screens used in navigation
 import Home from './screens/Home.js';
@@ -37,10 +38,46 @@ function App() {
           labelStyle: {color: 'white'},
         }}
         screenOptions={{}}>
-        <Tab.Screen name="Home" component={Home} />
-        <Tab.Screen name="Post" component={Post} />
-        <Tab.Screen name="Search" component={Search} />
-        <Tab.Screen name="Account" component={Account} />
+        <Tab.Screen
+          name="Home"
+          component={Home}
+          options={{
+            tabBarLabel: 'Home',
+            tabBarIcon: ({color, size}) => (
+              <Icon name="home" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Post"
+          component={Post}
+          options={{
+            tabBarLabel: 'Post',
+            tabBarIcon: ({color, size}) => (
+              <Icon name="feather" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Search"
+          component={Search}
+          options={{
+            tabBarLabel: 'Search',
+            tabBarIcon: ({color, size}) => (
+              <Icon name="search" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Account"
+          component={Account}
+          options={{
+            tabBarLabel: 'Account',
+            tabBarIcon: ({color, size}) => (
+              <Icon name="user" color={color} size={size} />
+            ),
+          }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );
