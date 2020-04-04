@@ -3,7 +3,6 @@ import {
   Text,
   View,
   Alert,
-  Button,
   StyleSheet,
   TouchableOpacity,
   Image,
@@ -11,7 +10,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Modal from 'react-native-modal';
-import {ListItem} from 'react-native-elements';
+import {ListItem, Button, Overlay} from 'react-native-elements';
 
 class viewOtherProfile extends Component {
   // Construct variables with default empty values
@@ -214,89 +213,13 @@ class viewOtherProfile extends Component {
     console.log('Debug: Profile loaded for user');
     return (
       <View style={styles.AccountControls}>
-        <Modal
-          //animationType="slide"
-          visible={this.state.modalVisible}
-          testID={'modal'}
-          //isVisible={this.isVisible()}
-          backdropColor="#B4B3DB"
-          backdropOpacity={0.8}
-          animationIn="zoomInDown"
-          animationOut="zoomOutUp"
-          animationInTiming={600}
-          animationOutTiming={600}
-          backdropTransitionInTiming={600}
-          backdropTransitionOutTiming={600}>
-          <View style={styles.modalContent}>
-            <Text style={styles.title}>Followers</Text>
-            <FlatList
-              data={this.state.followerList}
-              renderItem={({item}) => (
-                <ListItem
-                  containerStyle={styles.listItem}
-                  title={item.given_name + ' ' + item.family_name}
-                  subtitle={item.email}
-                  titleStyle={{color: 'white', fontWeight: 'bold'}}
-                  subtitleStyle={{color: 'white'}}
-                  onPress={() => this.viewProfile(item.user_id)}
-                />
-              )}
-              keyExtractor={({user_id}, index) => user_id}
-            />
-
-            <Button
-              testID={'close-button'}
-              onPress={() => {
-                this.setFollowersVisible(!this.state.modalVisible);
-              }}
-              title="Close"
-            />
-          </View>
-        </Modal>
-        <Modal
-          //animationType="slide"
-          visible={this.state.modalVisible2}
-          testID={'modal'}
-          //isVisible={this.isVisible()}
-          backdropColor="#B4B3DB"
-          backdropOpacity={0.8}
-          animationIn="zoomInDown"
-          animationOut="zoomOutUp"
-          animationInTiming={600}
-          animationOutTiming={600}
-          backdropTransitionInTiming={600}
-          backdropTransitionOutTiming={600}>
-          <View style={styles.modalContent}>
-            <Text style={styles.title}>Following</Text>
-            <FlatList
-              data={this.state.followingList}
-              renderItem={({item}) => (
-                <ListItem
-                  containerStyle={styles.listItem}
-                  title={item.given_name + ' ' + item.family_name}
-                  subtitle={item.email}
-                  titleStyle={styles.listItemTitle}
-                  subtitleStyle={styles.listItemSubtitle}
-                />
-              )}
-              keyExtractor={({user_id}, index) => user_id}
-            />
-
-            <Button
-              testID={'close-button'}
-              onPress={() => {
-                this.setFollowingVisible(!this.state.modalVisible2);
-              }}
-              title="Close"
-            />
-          </View>
-        </Modal>
         <Image
           source={{
             uri:
               'http://10.0.2.2:3333/api/v0.0.5/user/' +
-              this.state.profileData.view_user_id +
-              '/photo',
+              this.state.profileData.user_id +
+              '/photo?timestamp=' +
+              Date.now(),
           }}
           style={styles.profilePic}
         />
@@ -324,6 +247,103 @@ class viewOtherProfile extends Component {
           style={styles.button}>
           <Text style={styles.bodyText}>View Following</Text>
         </TouchableOpacity>
+        <Overlay
+          //animationType="slide"
+          // visible={this.state.modalVisible}
+          testID={'modal'}
+          isVisible={this.state.modalVisible}
+          backdropColor="#B4B3DB"
+          backdropOpacity={0.8}
+          animationIn="zoomInDown"
+          animationOut="zoomOutUp"
+          animationInTiming={600}
+          animationOutTiming={600}
+          backdropTransitionInTiming={600}
+          backdropTransitionOutTiming={600}>
+          <View style={styles.modalContent}>
+            <Text style={styles.title}>Followers</Text>
+            <FlatList
+              data={this.state.followerList}
+              keyExtractor={({user_id}) => user_id.toString()}
+              renderItem={({item}) => (
+                <ListItem
+                  containerStyle={styles.listItem}
+                  title={item.given_name + ' ' + item.family_name}
+                  subtitle={item.email}
+                  titleStyle={styles.listItemTitle}
+                  subtitleStyle={styles.listItemSubtitle}
+                  leftAvatar={{
+                    source: {
+                      uri:
+                        'http://10.0.2.2:3333/api/v0.0.5/user/' +
+                        item.user_id +
+                        '/photo?timestamp=' +
+                        Date.now(),
+                    },
+                  }}
+                  bottomDivider
+                  chevron={{color: 'white'}}
+                />
+              )}
+            />
+
+            <Button
+              testID={'close-button'}
+              onPress={() => {
+                this.setFollowersVisible(!this.state.modalVisible);
+              }}
+              title="Close"
+            />
+          </View>
+        </Overlay>
+        <Modal
+          //animationType="slide"
+          visible={this.state.modalVisible2}
+          testID={'modal'}
+          //isVisible={this.isVisible()}
+          backdropColor="#B4B3DB"
+          backdropOpacity={0.8}
+          animationIn="zoomInDown"
+          animationOut="zoomOutUp"
+          animationInTiming={600}
+          animationOutTiming={600}
+          backdropTransitionInTiming={600}
+          backdropTransitionOutTiming={600}>
+          <View style={styles.modalContent}>
+            <Text style={styles.title}>Following</Text>
+            <FlatList
+              data={this.state.followingList}
+              keyExtractor={({user_id}) => user_id.toString()}
+              renderItem={({item}) => (
+                <ListItem
+                  containerStyle={styles.listItem}
+                  title={item.given_name + ' ' + item.family_name}
+                  subtitle={item.email}
+                  titleStyle={styles.listItemTitle}
+                  subtitleStyle={styles.listItemSubtitle}
+                  leftAvatar={{
+                    source: {
+                      uri:
+                        'http://10.0.2.2:3333/api/v0.0.5/user/' +
+                        item.user_id +
+                        '/photo?timestamp=' +
+                        Date.now(),
+                    },
+                  }}
+                  bottomDivider
+                  chevron={{color: 'white'}}
+                />
+              )}
+            />
+            <Button
+              testID={'close-button'}
+              onPress={() => {
+                this.setFollowingVisible(!this.state.modalVisible2);
+              }}
+              title="Close"
+            />
+          </View>
+        </Modal>
       </View>
     );
   }

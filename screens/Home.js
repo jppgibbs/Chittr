@@ -21,7 +21,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true,
+      loading: true,
       chitList: [],
       user_id: '',
       x_auth: '',
@@ -65,7 +65,7 @@ class Home extends Component {
       .then(responseJson => {
         // Once we have a JSON response stop displaying placeholder and update the chit list
         this.setState({
-          isLoading: false,
+          loading: false,
           chitList: responseJson,
         });
       })
@@ -104,16 +104,16 @@ class Home extends Component {
 
   // Draw UI
   render() {
-    if (this.state.isLoading) {
+    if (this.state.loading) {
       // Show loading wheel if data isn't loaded yet
       return (
-        <View>
+        <View style={styles.primaryView}>
           <ActivityIndicator />
         </View>
       );
     }
     return (
-      <View style={styles.backgroundView} accessible={true}>
+      <View style={styles.primaryView} accessible={true}>
         <FlatList
           // Create list to store individual chit cards inside
           style={styles.chitMargin}
@@ -144,7 +144,6 @@ class Home extends Component {
               }
               imageProps={{
                 resizeMode: 'cover',
-                // containerStyle: styles.chitImage,
                 placeholderStyle: styles.chitHideImage,
                 PlaceholderContent: (
                   <View>
@@ -193,7 +192,7 @@ class Home extends Component {
 
 // Stylesheet
 const styles = StyleSheet.create({
-  backgroundView: {
+  primaryView: {
     flex: 1,
     flexDirection: 'column',
     backgroundColor: '#17202b',
@@ -239,7 +238,6 @@ const styles = StyleSheet.create({
     width: 320,
     height: 240,
   },
-  chitHideImage: {},
 });
 
 export default Home;

@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {TextInput, View, FlatList, StyleSheet} from 'react-native';
+import {View, FlatList, StyleSheet} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {ListItem} from 'react-native-elements';
+import {ListItem, SearchBar} from 'react-native-elements';
 
-class SearchUserScreen extends Component {
+class SearchUser extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -12,29 +12,21 @@ class SearchUserScreen extends Component {
     };
   }
 
-  //Retrieves ProfileID using AsyncStorage
-  storeSelection = async view_user_id => {
-    try {
-      await AsyncStorage.setItem('view_user_id', JSON.stringify(view_user_id));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  search = async text => {
-    this.setState({search: text});
-    if (text === '') {
+  // Query the server with whatever is in the search box currently
+  searchUser = async searchInput => {
+    this.setState({search: searchInput});
+    if (searchInput === '') {
       this.setState({
-        dataList: [],
+        searchResponse: [],
       });
     } else {
       try {
         const response = await fetch(
-          'http://10.0.2.2:3333/api/v0.0.5/search_user?q=' + text,
+          'http://10.0.2.2:3333/api/v0.0.5/search_user?q=' + searchInput,
         );
-        const responseJson = await response.json();
+        // const responseJson = await response.json();
         this.setState({
-          dataList: responseJson,
+          dataList: await response.json(),
         });
       } catch (error) {
         console.log(error);
@@ -42,19 +34,25 @@ class SearchUserScreen extends Component {
     }
   };
 
-  //Navigate to single profile function
-  viewProfile = view_user_id => {
-    this.storeSelection(view_user_id);
-    this.props.navigation.navigate('Viewing Profile');
+  // Stores the selected user id in async storage and loads the corresponding profile
+  goToProfile = async view_user_id => {
+    try {
+      await AsyncStorage.setItem('view_user_id', JSON.stringify(view_user_id));
+      this.props.navigation.navigate('Viewing Profile');
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   render() {
     return (
       <View style={styles.mainView}>
-        <TextInput
+        <SearchBar
+          containerStyle={styles.searchBarContainer}
+          inputContainerStyle={styles.textEntry}
           style={styles.textEntry}
-          onChangeText={this.search}
-          value={this.state.email}
+          value={this.state.search}
+          onChangeText={this.searchUser}
           placeholderTextColor="#918f8a"
           placeholder="Search for a user"
           textContentType="givenName"
@@ -66,6 +64,7 @@ class SearchUserScreen extends Component {
         <FlatList
           style={styles.list}
           data={this.state.dataList}
+          keyExtractor={({user_id}) => user_id.toString()}
           renderItem={({item}) => (
             <ListItem
               containerStyle={styles.listItem}
@@ -73,10 +72,20 @@ class SearchUserScreen extends Component {
               subtitle={item.email}
               titleStyle={styles.listItemTitle}
               subtitleStyle={styles.listItemSubtitle}
-              onPress={() => this.viewProfile(item.user_id)}
+              leftAvatar={{
+                source: {
+                  uri:
+                    'http://10.0.2.2:3333/api/v0.0.5/user/' +
+                    item.user_id +
+                    '/photo?timestamp=' +
+                    Date.now(),
+                },
+              }}
+              bottomDivider
+              chevron={{color: 'white'}}
+              onPress={() => this.goToProfile(item.user_id)}
             />
           )}
-          keyExtractor={(item, index) => String(index)}
         />
       </View>
     );
@@ -90,45 +99,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#17202b',
     color: '#ffffff',
   },
+  searchBarContainer: {
+    backgroundColor: '#17202b',
+    borderWidth: 0,
+  },
   listItemTitle: {color: 'white', fontWeight: 'bold'},
   listItemSubtitle: {color: 'white'},
   textEntry: {
     alignItems: 'center',
-    padding: 5,
-    color: '#ffffff',
-    marginTop: 5,
-    marginBottom: 0,
-    borderColor: '#2296f3',
-    borderRadius: 2,
-    borderWidth: 1,
     backgroundColor: '#273341',
-    elevation: 3,
     marginHorizontal: 15,
   },
   list: {
     padding: 10,
-    borderRadius: 3,
-    borderColor: '#3a444d',
     backgroundColor: '#17202b',
-    elevation: 2,
     marginTop: 10,
-    marginHorizontal: 15,
+    marginHorizontal: 10,
   },
   listItem: {
-    margin: 1,
-    padding: 20,
-    borderRadius: 3,
-    borderColor: '#3a444d',
-    borderWidth: 2,
     backgroundColor: '#1b2734',
-    elevation: 2,
-    color: '#ffffff',
-    marginHorizontal: 15,
-  },
-
-  userMargin: {
-    margin: 1,
-    padding: 20,
+    marginHorizontal: 5,
   },
   userName: {
     fontSize: 16,
@@ -136,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchUserScreen;
+export default SearchUser;

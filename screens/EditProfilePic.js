@@ -3,13 +3,18 @@ import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {RNCamera} from 'react-native-camera';
 
+/*
+## EditProfilePic
+- In this screen we allow the user to take a picture and post it to the server in order
+to change the profile picture associated with their account.
+*/
+
 class EditProfilePic extends Component {
   constructor(props) {
     super(props);
     this.state = {
       x_auth: '',
       user_id: '',
-      photo: null,
     };
   }
   // Get account info from async on first load and every subsequent navigation
@@ -35,7 +40,7 @@ class EditProfilePic extends Component {
         user_id: user_id_json,
       });
       console.log(
-        'Debug: PostChit Loaded with uid: ' +
+        '(EditProfilePic)  Loaded with uid: ' +
           this.state.user_id +
           ' auth key: ' +
           this.state.x_auth,
@@ -45,6 +50,7 @@ class EditProfilePic extends Component {
     }
   }
 
+  // Get the current camera view and post it to the server on button press
   takePhoto = async () => {
     const options = {quality: 1, base64: true};
     return fetch('http://10.0.2.2:3333/api/v0.0.5/user/photo', {
@@ -57,10 +63,12 @@ class EditProfilePic extends Component {
     })
       .then(response => {
         this.props.navigation.navigate('Account');
-        console.log('Photo taken');
+        console.log('(EditProfilePic) Photo taken');
       })
       .catch(error => {
-        console.error('Failed to take/store photo. Log: ' + error);
+        console.error(
+          '(EditProfilePic) Failed to take/store photo. Log: ' + error,
+        );
       });
   };
 
@@ -84,6 +92,7 @@ class EditProfilePic extends Component {
   }
 }
 
+// Stylesheet
 const styles = StyleSheet.create({
   primaryView: {
     flex: 1,

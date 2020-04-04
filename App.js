@@ -13,8 +13,14 @@ import EditProfile from './screens/EditProfile.js';
 import Camera from './screens/Camera.js';
 import SearchUserScreen from './screens/SearchUser.js';
 import ViewOtherProfile from './screens/ViewProfile.js';
-import ChangeProfilePic from './screens/ChangePictureScreen.js';
+import ChangeProfilePic from './screens/EditProfilePic.js';
 import Drafts from './screens/Drafts.js';
+
+/*
+## App.js
+- This file is responsible for the initialization of all of the navigations,
+their styles, and how they are nested inside each other.
+*/
 
 // Define both of our navigation styles
 const Tab = createBottomTabNavigator();

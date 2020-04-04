@@ -28,6 +28,11 @@ class Account extends Component {
     };
   }
 
+  // ##################
+  // ## Load Account ##
+  // ##################
+
+  // Get account info from async on first load and every subsequent navigation
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.retrieveAsync();
@@ -35,6 +40,7 @@ class Account extends Component {
     this.retrieveAsync();
   }
 
+  // Retrieve account data from Async storage
   async retrieveAsync() {
     try {
       // Retreieve from Async Storage
@@ -49,7 +55,7 @@ class Account extends Component {
         user_id: user_id_json,
       });
       console.log(
-        'Debug: PostChit Loaded with uid: ' +
+        '(UserProfile): Loaded with uid: ' +
           this.state.user_id +
           ' auth key: ' +
           this.state.x_auth,
@@ -60,6 +66,7 @@ class Account extends Component {
     }
   }
 
+  // Get account data from the server
   getProfileData() {
     return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.user_id, {
       method: 'GET',
@@ -71,7 +78,7 @@ class Account extends Component {
             profileData: responseJson,
           },
           () => {
-            console.log('Debug: Account retrieved profile async');
+            console.log('(UserProfile): Account retrieved profile async');
           },
         );
       })
@@ -79,8 +86,11 @@ class Account extends Component {
         console.log(error);
       });
   }
+  // ############
+  // ## Logout ##
+  // ############
 
-  // Logout
+  // Clear login data and token from the async storage
   async clearAccount() {
     try {
       await AsyncStorage.removeItem('x_auth');
@@ -91,6 +101,8 @@ class Account extends Component {
       console.log('Removing auth key failed: ' + error);
     }
   }
+
+  // Send logout request to the server
   Logout = () => {
     return fetch('http://10.0.2.2:3333/api/v0.0.5/logout', {
       method: 'POST',
@@ -111,15 +123,12 @@ class Account extends Component {
       });
   };
 
-
-
   render() {
     if (this.state.user_id !== null) {
       // IF LOGGED IN
-      console.log('Debug: Profile loaded as logged in asdasda');
-      console.log(this.state.x_auth);
+      console.log('(UserProfile): Profile loaded as logged in');
       return (
-        <View style={styles.AccountControls}>
+        <View style={styles.primaryView}>
           <Image
             source={{
               uri:
@@ -157,9 +166,9 @@ class Account extends Component {
       );
     } else {
       // IF LOGGED OUT
-      console.log('Debug: Profile loaded as logged out');
+      console.log('(UserProfile): Profile loaded as logged out');
       return (
-        <View style={styles.AccountControls}>
+        <View style={styles.primaryView}>
           <TouchableOpacity
             onPress={() => this.props.navigation.navigate('Register')}
             style={styles.button}>
@@ -176,15 +185,9 @@ class Account extends Component {
   }
 }
 
+// Stylesheet
 const styles = StyleSheet.create({
-  mainView: {
-    justifyContent: 'center',
-    flex: 1,
-    flexDirection: 'column',
-    backgroundColor: '#17202b',
-    color: '#ffffff',
-  },
-  AccountControls: {
+  primaryView: {
     justifyContent: 'center',
     flex: 1,
     flexDirection: 'column',
@@ -201,20 +204,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 2,
     backgroundColor: '#2296f3',
-    marginLeft: 15,
-    marginRight: 15,
-  },
-  textEntry: {
-    alignItems: 'center',
-    padding: 5,
-    color: '#ffffff',
-    marginTop: 5,
-    marginBottom: 0,
-    borderColor: '#2296f3',
-    borderRadius: 2,
-    borderWidth: 1,
-    backgroundColor: '#273341',
-    elevation: 3,
     marginLeft: 15,
     marginRight: 15,
   },

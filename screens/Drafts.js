@@ -240,14 +240,14 @@ class Drafts extends Component {
     this.setState({isDialogVisible: visible});
   }
 
-  // List Index
-  setIndexAccessed(index) {
-    this.setState({array_index: index});
-  }
-
   // Show/Hide scheduler
   setTimePicker(visible) {
     this.setState({isScheduleDialogVisible: visible});
+  }
+
+  // List Index
+  setIndexAccessed(index) {
+    this.setState({array_index: index});
   }
 
   // Draw UI
