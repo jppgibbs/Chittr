@@ -1,10 +1,18 @@
 import React, {Component} from 'react';
-import {Text, View, Alert, StyleSheet, Image, FlatList} from 'react-native';
+import {
+  Text,
+  View,
+  Alert,
+  StyleSheet,
+  Image,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {ListItem, Button, Overlay} from 'react-native-elements';
+import {ListItem, Button, Overlay, Card} from 'react-native-elements';
 
-class viewOtherProfile extends Component {
+class ViewProfile extends Component {
   // Construct variables with default empty values
   constructor(props) {
     super(props);
@@ -12,8 +20,10 @@ class viewOtherProfile extends Component {
       profileData: [],
       followerList: [],
       followingList: [],
+      chitList: [],
       followerOverlayVisible: false,
       followingOverlayVisible: false,
+      recentChitsOverlayVisible: false,
     };
   }
 
@@ -86,6 +96,21 @@ class viewOtherProfile extends Component {
       })
       .catch(error => {
         console.log('Debug: error retreiving chits:' + error);
+      });
+  }
+
+  getMostRecentChit() {
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.user_id)
+      .then(response => response.json())
+      .then(responseJson => {
+        let chit_id = responseJson.recent_chits[0].chit_id;
+        this.setState({
+          chit_id: chit_id,
+          chitList: responseJson,
+        });
+      })
+      .catch(error => {
+        console.log(error);
       });
   }
 
@@ -185,6 +210,10 @@ class viewOtherProfile extends Component {
   }
 
   // Followers Overlay
+  setRecentChitsVisible(visible) {
+    this.setState({recentChitsOverlayVisible: visible});
+  }
+  // Followers Overlay
   setFollowersVisible(visible) {
     this.setState({followerOverlayVisible: visible});
   }
@@ -216,6 +245,21 @@ class viewOtherProfile extends Component {
           Account ID: {this.state.profileData.user_id}
         </Text>
         <View style={styles.buttonGridContainer}>
+          <Button
+            title="Recent Chits"
+            onPress={() =>
+              this.setRecentChitsVisible(!this.state.recentChitsOverlayVisible)
+            }
+            buttonStyle={styles.button_o}
+            icon={
+              <Icon
+                name="clock"
+                size={15}
+                color="white"
+                style={styles.buttonIcon}
+              />
+            }
+          />
           <Button
             title="Follow"
             onPress={() => this.follow()}
@@ -273,6 +317,97 @@ class viewOtherProfile extends Component {
             }
           />
         </View>
+        <Overlay
+          animationType="slide"
+          testID={'modal'}
+          isVisible={this.state.recentChitsOverlayVisible}
+          backdropColor="#B4B3DB"
+          backdropOpacity={0.8}
+          animationIn="zoomInDown"
+          animationOut="zoomOutUp"
+          animationInTiming={600}
+          animationOutTiming={600}
+          overlayStyle={styles.modalContent}
+          backdropTransitionInTiming={600}
+          backdropTransitionOutTiming={600}
+          onBackdropPress={() =>
+            this.setRecentChitsVisible(!this.state.recentChitsOverlayVisible)
+          }
+          children={
+            <View>
+              <FlatList
+                ListHeaderComponent={
+                  <Text style={styles.title}>
+                    <Icon
+                      name="clock"
+                      size={15}
+                      color="white"
+                      style={styles.buttonIcon}
+                    />
+                    &nbsp; Recent Chits
+                  </Text>
+                }
+                data={this.state.profileData.recent_chits}
+                keyExtractor={({chit_id}) => chit_id.toString()}
+                renderItem={({item}) => (
+                  <Card
+                    // Create chit cards to store chit content
+                    accessible={true}
+                    containerStyle={styles.chitContainer}
+                    titleStyle={styles.title}
+                    imageProps={{
+                      resizeMode: 'cover',
+                      placeholderStyle: styles.chitHideImage,
+                      PlaceholderContent: (
+                        <View>
+                          <ActivityIndicator />
+                        </View>
+                      ),
+                    }}
+                    image={{
+                      uri:
+                        'http://10.0.2.2:3333/api/v0.0.5/chits/' +
+                        item.chit_id +
+                        '/photo',
+                    }}>
+                    <Text
+                      style={styles.chitContent}
+                      accessible={true}
+                      accessibilityRole="text">
+                      <Text accessible={true} accessibilityRole="text">
+                        {item.chit_content}
+                        {'\n'}
+                        {'\n'}
+                      </Text>
+                      <Text
+                        style={styles.timestamp}
+                        accessible={true}
+                        accessibilityRole="text">
+                        {new Date(item.timestamp).toLocaleString()}
+                      </Text>
+                      {'\n'}
+                      {item.location == undefined ? (
+                        (item.location = 'No Location Provided')
+                      ) : (
+                        <Text
+                          style={styles.timestamp}
+                          accessible={true}
+                          accessibilityRole="text">
+                          {'Location: ' +
+                            item.location.latitude +
+                            ', ' +
+                            item.location.longitude}
+                        </Text>
+                      )}
+                    </Text>
+                    {/* {this.renderImage(item.chit_id)} */}
+                  </Card>
+                )}
+              />
+            </View>
+          }
+        />
+
         <Overlay
           animationType="slide"
           testID={'modal'}
@@ -418,11 +553,6 @@ const styles = StyleSheet.create({
     width: 150,
     alignItems: 'center',
     elevation: 2,
-    padding: 10,
-    borderColor: '#101010',
-    borderWidth: 1,
-    borderRadius: 2,
-    backgroundColor: '#2296f3',
     marginVertical: 3,
     marginHorizontal: 3,
   },
@@ -439,16 +569,9 @@ const styles = StyleSheet.create({
   },
   button_o: {
     alignItems: 'center',
-    elevation: 2,
-    padding: 10,
-    marginTop: 5,
-    marginBottom: 0,
-    borderColor: '#101010',
-    borderWidth: 1,
-    borderRadius: 2,
-    backgroundColor: '#2296f3',
-    marginLeft: 15,
-    marginRight: 15,
+    width: 306,
+    marginVertical: 3,
+    marginHorizontal: 3,
   },
   title: {
     fontSize: 18,
@@ -490,6 +613,34 @@ const styles = StyleSheet.create({
     backgroundColor: '#1b2734',
     marginHorizontal: 5,
   },
+  nameContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+  },
+  timestampContainer: {flexGrow: 1},
+  timestamp: {
+    fontSize: 14,
+    color: '#ffffff',
+    marginTop: 7,
+  },
+  chitContainer: {
+    margin: 1,
+    padding: 20,
+    borderRadius: 3,
+    borderColor: '#3a444d',
+    borderWidth: 2,
+    backgroundColor: '#1b2734',
+    elevation: 2,
+  },
+  chitContent: {
+    fontSize: 14,
+    color: '#ffffff',
+  },
+  chitName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
 
-export default viewOtherProfile;
+export default ViewProfile;

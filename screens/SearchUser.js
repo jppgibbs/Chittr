@@ -12,24 +12,31 @@ class SearchUser extends Component {
     };
   }
 
+  componentDidMount() {
+    this.searchUser('');
+  }
+
   // Query the server with whatever is in the search box currently
   searchUser = async searchInput => {
     this.setState({search: searchInput});
     if (searchInput === '') {
+      const response = await fetch(
+        // If nothing is in the search bar then show a list of all users
+        'http://10.0.2.2:3333/api/v0.0.5/search_user?q=' + '@',
+      );
       this.setState({
-        searchResponse: [],
+        dataList: await response.json(),
       });
     } else {
       try {
         const response = await fetch(
           'http://10.0.2.2:3333/api/v0.0.5/search_user?q=' + searchInput,
         );
-        // const responseJson = await response.json();
         this.setState({
           dataList: await response.json(),
         });
       } catch (error) {
-        console.log(error);
+        console.log('(Search) Error searching users' + error);
       }
     }
   };
@@ -40,7 +47,7 @@ class SearchUser extends Component {
       await AsyncStorage.setItem('view_user_id', JSON.stringify(view_user_id));
       this.props.navigation.navigate('Viewing Profile');
     } catch (error) {
-      console.log(error);
+      console.log('(Search) Navigating to user profile' + error);
     }
   };
 

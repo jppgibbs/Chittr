@@ -1,11 +1,12 @@
 import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createStackNavigator} from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Import each of the screens used in navigation
 import Home from './screens/Home.js';
+import IndividualChit from './screens/individualChit.js';
 import PostChits from './screens/PostChits.js';
 import Login from './screens/Login.js';
 import Register from './screens/Register.js';
@@ -24,7 +25,7 @@ their styles, and how they are nested inside each other.
 */
 
 // Define both of our navigation styles
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
 
 // Create a tab navigator for each of the 4 primary tabs
@@ -32,19 +33,22 @@ function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
+        activeColor="#f0edf6"
+        // inactiveColor="#3e2465"
+        barStyle={{backgroundColor: '#182633'}}
         tabBarOptions={{
           activeBackgroundColor: '#101922',
           style: {backgroundColor: '#182633'},
           labelStyle: {color: 'white'},
         }}
-        screenOptions={{}}>
+        screenOptions={{gestureEnabled: true, gestureDirection: 'horizontal'}}>
         <Tab.Screen
           name="Home"
-          component={Home}
+          component={Main}
           options={{
             tabBarLabel: 'Home',
-            tabBarIcon: ({color, size}) => (
-              <Icon name="home" color={color} size={size} />
+            tabBarIcon: ({color}) => (
+              <Icon name="home" color={color} size={26} />
             ),
           }}
         />
@@ -53,8 +57,8 @@ function App() {
           component={Post}
           options={{
             tabBarLabel: 'Post',
-            tabBarIcon: ({color, size}) => (
-              <Icon name="feather" color={color} size={size} />
+            tabBarIcon: ({color}) => (
+              <Icon name="feather" color={color} size={26} />
             ),
           }}
         />
@@ -63,8 +67,8 @@ function App() {
           component={Search}
           options={{
             tabBarLabel: 'Search',
-            tabBarIcon: ({color, size}) => (
-              <Icon name="search" color={color} size={size} />
+            tabBarIcon: ({color}) => (
+              <Icon name="magnify" color={color} size={26} />
             ),
           }}
         />
@@ -73,8 +77,8 @@ function App() {
           component={Account}
           options={{
             tabBarLabel: 'Account',
-            tabBarIcon: ({color, size}) => (
-              <Icon name="user" color={color} size={size} />
+            tabBarIcon: ({color}) => (
+              <Icon name="account" color={color} size={26} />
             ),
           }}
         />
@@ -83,16 +87,47 @@ function App() {
   );
 }
 
+// Home stack navigation nested inside tab navigation
+function Main() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Home"
+      headerMode="float"
+      screenOptions={{
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+        headerTintColor: 'white',
+        headerTitleStyle: {color: 'white'},
+        headerStyle: {backgroundColor: '#182633'},
+        ...TransitionPresets.SlideFromRightIOS,
+        transitionSpec: {
+          open: config,
+          close: config,
+        },
+      }}>
+      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Viewing Chit" component={IndividualChit} />
+    </Stack.Navigator>
+  );
+}
+
 // Post stack navigation nested inside tab navigation
 function Post() {
   return (
     <Stack.Navigator
       initialRouteName="Post"
-      headerMode="screen"
+      headerMode="float"
       screenOptions={{
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
         headerTintColor: 'white',
         headerTitleStyle: {color: 'white'},
         headerStyle: {backgroundColor: '#182633'},
+        ...TransitionPresets.SlideFromRightIOS,
+        transitionSpec: {
+          open: config,
+          close: config,
+        },
       }}>
       <Stack.Screen name="New Chit" component={PostChits} />
       <Stack.Screen name="Camera" component={Camera} />
@@ -106,11 +141,18 @@ function Search() {
   return (
     <Stack.Navigator
       initialRouteName="Search"
-      headerMode="screen"
+      headerMode="float"
       screenOptions={{
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
         headerTintColor: 'white',
         headerTitleStyle: {color: 'white'},
         headerStyle: {backgroundColor: '#182633'},
+        ...TransitionPresets.SlideFromRightIOS,
+        transitionSpec: {
+          open: config,
+          close: config,
+        },
       }}>
       <Stack.Screen name="Search Users" component={SearchUserScreen} />
       <Stack.Screen name="Viewing Profile" component={ViewOtherProfile} />
@@ -123,11 +165,18 @@ function Account() {
   return (
     <Stack.Navigator
       initialRouteName="Profile"
-      headerMode="screen"
+      headerMode="float"
       screenOptions={{
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
         headerTintColor: 'white',
         headerTitleStyle: {color: 'white'},
         headerStyle: {backgroundColor: '#182633'},
+        ...TransitionPresets.SlideFromRightIOS,
+        transitionSpec: {
+          open: config,
+          close: config,
+        },
       }}>
       <Stack.Screen name="Account" component={Profile} />
       <Stack.Screen name="Login" component={Login} />
@@ -138,4 +187,15 @@ function Account() {
   );
 }
 
+const config = {
+  animation: 'spring',
+  config: {
+    stiffness: 1000,
+    damping: 50,
+    mass: 3,
+    overshootClamping: false,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  },
+};
 export default App;

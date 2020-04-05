@@ -5,9 +5,10 @@ import {
   Text,
   View,
   StyleSheet,
+  TouchableNativeFeedback,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {Card, Avatar} from 'react-native-elements';
+import {Card, Avatar, Image} from 'react-native-elements';
 
 /*
 ## Home Screen
@@ -15,6 +16,7 @@ import {Card, Avatar} from 'react-native-elements';
 - It displays all chits from accounts the user is following, sorting most recent first.
 
 TODO: if an image cannot be found in a chit then hide the image container
+TODO: When bottom of the list is reached, + 5 the count loaded
 */
 
 class Home extends Component {
@@ -23,6 +25,7 @@ class Home extends Component {
     this.state = {
       loading: true,
       chitList: [],
+      photoList: [],
       user_id: '',
       x_auth: '',
     };
@@ -60,7 +63,7 @@ class Home extends Component {
   // Retrieve chits from the database
   getData() {
     // Connect to mudfoot server and retrieve data (start={Index to start from}; count={Number of chits to display})
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=50')
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=10')
       .then(response => response.json())
       .then(responseJson => {
         // Once we have a JSON response stop displaying placeholder and update the chit list
@@ -70,9 +73,21 @@ class Home extends Component {
         });
       })
       .catch(error => {
-        console.log('(Home) Error retreiving chits:' + error);
+        console.log('(Home) Error retreiving chits: ' + error);
       });
   }
+
+  // Stores the selected user id in async storage and loads the corresponding profile
+  goToProfile = async view_user_id => {
+    try {
+      await AsyncStorage.setItem('view_user_id', JSON.stringify(view_user_id));
+      this.props.navigation.navigate('Search', {
+        screen: 'Viewing Profile',
+      });
+    } catch (error) {
+      console.log('(Home) Navigating to user profile' + error);
+    }
+  };
 
   // ## Attempt at removing image container from chits without an image
   // renderImage = chit_id => {
@@ -118,6 +133,8 @@ class Home extends Component {
           // Create list to store individual chit cards inside
           style={styles.chitMargin}
           data={this.state.chitList}
+          // onEndReachedThreshold={0.25}
+          // onEndReached={this.loadChits} // Load More
           keyExtractor={({chit_id}) => chit_id.toString()}
           renderItem={({item}) => (
             <Card
@@ -125,11 +142,13 @@ class Home extends Component {
               accessible={true}
               containerStyle={styles.chitContainer}
               titleStyle={styles.title}
+              onRefresh={this.getData}
               title={
                 <View style={styles.nameContainer}>
                   <Avatar
                     rounded
                     containerStyle={styles.avatarContainer}
+                    onPress={() => this.goToProfile(item.user.user_id)}
                     source={{
                       uri:
                         'http://10.0.2.2:3333/api/v0.0.5/user/' +
@@ -138,12 +157,16 @@ class Home extends Component {
                         Date.now(),
                     }}
                   />
-                  <Text
-                    style={styles.title}
-                    accessible={true}
-                    accessibilityRole="text">
-                    {item.user.given_name} {item.user.family_name}
-                  </Text>
+                  <TouchableNativeFeedback
+                    onPress={() => this.goToProfile(item.user.user_id)}>
+                    <Text
+                      style={styles.title}
+                      accessible={true}
+                      accessibilityRole="text">
+                      {item.user.given_name} {item.user.family_name}
+                    </Text>
+                  </TouchableNativeFeedback>
+
                   <View style={styles.timestampContainer} />
                   <Text
                     style={styles.timestamp}

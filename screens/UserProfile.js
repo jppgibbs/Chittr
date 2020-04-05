@@ -1,12 +1,5 @@
 import React, {Component} from 'react';
-import {
-  Text,
-  View,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import {Text, View, Alert, StyleSheet, FlatList} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {ListItem, Button, Overlay, Avatar} from 'react-native-elements';
@@ -259,7 +252,7 @@ class Account extends Component {
             />
             <Button
               title="Logout"
-              onPress={() => this.logout()}
+              onPress={() => this.Logout()}
               buttonStyle={styles.buttonSquare}
               icon={
                 <Icon
@@ -391,16 +384,16 @@ class Account extends Component {
       console.log('(UserProfile): Profile loaded as logged out');
       return (
         <View style={styles.primaryView}>
-          <TouchableOpacity
+          <Button
             onPress={() => this.props.navigation.navigate('Register')}
-            style={styles.buttonSquare}>
-            <Text style={styles.bodyText}>Register</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+            title="Register"
+            buttonStyle={styles.button}
+          />
+          <Button
             onPress={() => this.props.navigation.navigate('Login')}
-            style={styles.buttonSquare}>
-            <Text style={styles.bodyText}>Log In</Text>
-          </TouchableOpacity>
+            title="Login"
+            buttonStyle={styles.button}
+          />
         </View>
       );
     }
@@ -420,18 +413,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    marginTop: 25,
+    marginTop: 10,
   },
   buttonSquare: {
     height: 100,
     width: 150,
     alignItems: 'center',
-    elevation: 2,
     padding: 10,
-    borderColor: '#101010',
-    borderWidth: 1,
-    borderRadius: 2,
-    backgroundColor: '#2296f3',
     marginVertical: 3,
     marginHorizontal: 3,
   },
@@ -447,7 +435,6 @@ const styles = StyleSheet.create({
     borderColor: '#101010',
     borderWidth: 1,
     borderRadius: 2,
-    backgroundColor: '#2296f3',
     marginLeft: 15,
     marginRight: 15,
   },
@@ -461,26 +448,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#ffffff',
-    marginLeft: 15,
-    marginRight: 15,
-    marginBottom: 5,
+    marginLeft: 50,
   },
   bodyText: {
     color: '#ffffff',
-    marginLeft: 15,
-    marginRight: 15,
+    marginLeft: 50,
   },
   nameText: {
     color: '#ffffff',
     fontWeight: 'bold',
     fontSize: 32,
-    marginHorizontal: '30%',
+    alignSelf: 'center',
   },
   detailText: {
     color: '#ffffff',
     fontWeight: 'bold',
     fontSize: 18,
-    marginHorizontal: '32%',
+    alignSelf: 'center',
   },
   listItemTitle: {color: 'white', fontWeight: 'bold'},
   listItemSubtitle: {color: 'white'},
