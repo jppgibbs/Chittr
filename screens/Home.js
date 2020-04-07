@@ -8,7 +8,7 @@ import {
   TouchableNativeFeedback,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {Card, Avatar, Image} from 'react-native-elements';
+import {Card, Avatar} from 'react-native-elements';
 
 /*
 ## Home Screen
@@ -178,12 +178,7 @@ class Home extends Component {
               }
               imageProps={{
                 resizeMode: 'cover',
-                placeholderStyle: styles.chitHideImage,
-                PlaceholderContent: (
-                  <View>
-                    <ActivityIndicator />
-                  </View>
-                ),
+                placeholderStyle: styles.phContainer,
               }}
               image={{
                 uri:
@@ -202,7 +197,7 @@ class Home extends Component {
                 </Text>
                 {'\n'}
                 {item.location == undefined ? (
-                  (item.location = 'No Location Provided')
+                  (item.location = ' ')
                 ) : (
                   <Text
                     style={styles.timestamp}
@@ -261,6 +256,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     backgroundColor: '#1b2734',
     elevation: 2,
+  },
+  phContainer: {
+    backgroundColor: '#1b2734',
+    height: -1,
   },
   chitContent: {
     fontSize: 14,

@@ -2,21 +2,19 @@ import React, {Component} from 'react';
 
 import {
   FlatList,
-  ActivityIndicator,
   TextInput,
   Text,
   View,
   StyleSheet,
   Alert,
   PermissionsAndroid,
-  TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from 'react-native-geolocation-service';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import {Card, Image, ListItem, Button, Divider} from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import {Card, Button, Overlay} from 'react-native-elements';
 import BackgroundTimer from 'react-native-background-timer';
-import DatePicker from 'react-native-datepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import Modal from 'react-native-modal';
 
@@ -59,7 +57,7 @@ class Drafts extends Component {
       isDialogVisible: false,
       isScheduleDialogVisible: false,
       setShow: false,
-      date: '',
+      date: null,
     };
   }
 
@@ -229,7 +227,33 @@ class Drafts extends Component {
   //           SCHEDULING DRAFTS
   // #######################################
 
-  scheduleChit() {}
+  scheduleChit() {
+    var dateNow = Date.parse(new Date());
+    console.log(dateNow);
+    var difference = Math.abs(this.state.date.nativeEvent.timestamp - dateNow);
+    console.log(this.state.date);
+    console.log('diff = ' + difference);
+
+    const scheduledChit = BackgroundTimer.setTimeout(() => {
+      return fetch('http://10.0.2.2:3333/api/v0.0.5/chits', {
+        method: 'POST',
+        body: JSON.stringify({
+          chit_content: this.state.current_draft,
+          timestamp: Date.parse(new Date()),
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Authorization': JSON.parse(this.state.x_auth),
+        },
+      })
+        .then(response => {
+          console.log('(Drafts) Chit scheduled in: ' + difference);
+        })
+        .catch(error => {
+          console.error('[ERROR] Error adding scheduled Chit. Log: ' + error);
+        });
+    }, difference);
+  }
 
   // #######################################
   //              Interface
@@ -252,12 +276,13 @@ class Drafts extends Component {
 
   // Draw UI
   render() {
+    let timestamp = new Date();
     console.log('(Drafts) Current Listed Drafts: ' + this.state.draftList);
     return (
       <View style={styles.mainView}>
         <FlatList
           style={styles.chitList}
-          //keyExtractor={({chit_content}, timestamp) => chit_content.toString()}
+          keyExtractor={({chit_content}) => chit_content.toString()}
           data={this.state.draftList}
           renderItem={({item, index}) => (
             <Card containerStyle={styles.chitContainer}>
@@ -268,14 +293,28 @@ class Drafts extends Component {
               <View style={styles.buttonContainer}>
                 <Button
                   buttonStyle={styles.button}
-                  title="POST"
                   type="outline"
+                  icon={
+                    <Icon
+                      name="paper-plane"
+                      size={26}
+                      color="white"
+                      style={styles.buttonIcon}
+                    />
+                  }
                   onPress={() => this.postDraft(item.chit_content)} // delete draft when posted??
                 />
                 <Button
                   buttonStyle={styles.button}
-                  title="EDIT"
                   type="outline"
+                  icon={
+                    <Icon
+                      name="edit"
+                      size={26}
+                      color="white"
+                      style={styles.buttonIcon}
+                    />
+                  }
                   onPress={() => {
                     this.setDialogVisible(!this.state.isDialogVisible);
                     this.setIndexAccessed(index);
@@ -283,63 +322,87 @@ class Drafts extends Component {
                 />
                 <Button
                   buttonStyle={styles.button}
-                  title="DELETE"
                   type="outline"
+                  icon={
+                    <Icon
+                      name="trash"
+                      size={26}
+                      color="white"
+                      style={styles.buttonIcon}
+                    />
+                  }
                   onPress={() => {
                     this.createDeleteDraftArray(index);
                   }}
                 />
                 <Button
                   buttonStyle={styles.button}
-                  title="SCHEDULE"
                   type="outline"
+                  icon={
+                    <Icon
+                      name="clock"
+                      size={26}
+                      color="white"
+                      style={styles.buttonIcon}
+                    />
+                  }
                   onPress={() => {
+                    this.setState({current_draft: item.chit_content});
                     this.setTimePicker(!this.state.isScheduleDialogVisible);
                   }}
                 />
               </View>
-              <Modal
+              <Overlay
                 animationType="slide"
-                visible={this.state.isDialogVisible}
                 testID={'modal'}
+                isVisible={this.state.isDialogVisible}
                 backdropColor="#B4B3DB"
-                backdropOpacity={0.2}
+                backdropOpacity={0.8}
                 animationIn="zoomInDown"
                 animationOut="zoomOutUp"
                 animationInTiming={600}
                 animationOutTiming={600}
+                overlayStyle={styles.modalContent}
                 backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}>
-                <View style={styles.modalContent}>
-                  <Text style={styles.title}>Edit Draft</Text>
-                  <TextInput
-                    style={styles.textEntry}
-                    defaultValue={
-                      this.state.draftList[this.state.array_index].chit_content
-                    }
-                    autoCapitalize="sentences"
-                    multiline
-                    numberOfLines={4}
-                    maxLength={141}
-                    onChangeText={text => this.setState({current_draft: text})}
-                  />
-                  <Text style={styles.bodyText}>141 character limit</Text>
-                  <Button
-                    buttonStyle={styles.buttonModal}
-                    testID={'edit-chit'}
-                    onPress={() => this.editDraft()}
-                    title="Edit Chit"
-                  />
-                  <Button
-                    buttonStyle={styles.buttonModal}
-                    testID={'close-button'}
-                    onPress={() => {
-                      this.setDialogVisible(!this.state.isDialogVisible);
-                    }}
-                    title="Close"
-                  />
-                </View>
-              </Modal>
+                backdropTransitionOutTiming={600}
+                onBackdropPress={() =>
+                  this.setDialogVisible(!this.state.isDialogVisible)
+                }
+                children={
+                  <View style={styles.modalContent}>
+                    <Text style={styles.title}>Edit Draft</Text>
+                    <TextInput
+                      style={styles.textEntry}
+                      defaultValue={
+                        this.state.draftList[this.state.array_index]
+                          .chit_content
+                      }
+                      autoCapitalize="sentences"
+                      multiline
+                      numberOfLines={4}
+                      maxLength={141}
+                      onChangeText={text =>
+                        this.setState({current_draft: text})
+                      }
+                    />
+                    <Text style={styles.bodyText}>141 character limit</Text>
+                    <Button
+                      buttonStyle={styles.buttonModal}
+                      testID={'edit-chit'}
+                      onPress={() => this.editDraft()}
+                      title="Edit Chit"
+                    />
+                    <Button
+                      buttonStyle={styles.buttonModal}
+                      testID={'close-button'}
+                      onPress={() => {
+                        this.setDialogVisible(!this.state.isDialogVisible);
+                      }}
+                      title="Close"
+                    />
+                  </View>
+                }
+              />
               <Modal
                 animationType="slide"
                 visible={this.state.isScheduleDialogVisible}
@@ -351,37 +414,27 @@ class Drafts extends Component {
                 animationInTiming={600}
                 animationOutTiming={600}
                 backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}>
-                <View style={styles.modalContent}>
-                  <Text style={styles.title}>Schedule Draft</Text>
-                  <DatePicker
-                    buttonStyle={styles.dateTimePicker}
-                    style={styles.dateTimePicker}
-                    date={this.state.date}
-                    mode="time" // Limited to time only, modify to allow date scheduling
-                    placeholder="Pick a time"
-                    format="DD-MM-YYYY HH-mm"
-                    onDateChange={date => {
-                      this.setState({date: date});
-                    }}
-                  />
-                  <Button
-                    buttonStyle={styles.buttonModal}
-                    testID={'schedule-button'}
-                    onPress={() => {
-                      this.scheduleChit();
-                    }}
-                    title="Schedule"
-                  />
-                  <Button
-                    buttonStyle={styles.buttonModal}
-                    testID={'close-button'}
-                    onPress={() => {
-                      this.setTimePicker(!this.state.isScheduleDialogVisible);
-                    }}
-                    title="Close"
-                  />
-                </View>
+                backdropTransitionOutTiming={600}
+                onBackdropPress={() =>
+                  this.setTimePicker(!this.state.isScheduleDialogVisible)
+                }>
+                <DateTimePicker
+                  buttonStyle={styles.dateTimePicker}
+                  style={styles.dateTimePicker}
+                  value={new Date()}
+                  //date={this.state.date}
+                  mode="time" // Limited to time only, modify to allow date scheduling
+                  placeholder="Pick a time"
+                  format="DD-MM-YYYY HH-mm"
+                  onDateChange={(date) => {
+                    this.setState({date: date});
+                    this.scheduleChit();
+                  }}
+                  onChange={date => {
+                    this.setState({date: date});
+                    this.scheduleChit();
+                  }}
+                />
               </Modal>
             </Card>
           )}
@@ -432,8 +485,10 @@ const styles = StyleSheet.create({
     flex: 3,
   },
   button: {
-    padding: 5,
-    marginHorizontal: 7,
+    padding: 10,
+    width: 50,
+    height: 50,
+    marginHorizontal: 5,
   },
   textEntry: {
     alignItems: 'center',
@@ -458,11 +513,8 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   modalContent: {
-    backgroundColor: '#006494',
-    padding: 5,
+    backgroundColor: '#17202b',
     justifyContent: 'center',
-    borderRadius: 4,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
   },
   modalContentTitle: {
     fontSize: 20,

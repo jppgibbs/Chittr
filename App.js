@@ -6,7 +6,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Import each of the screens used in navigation
 import Home from './screens/Home.js';
-import IndividualChit from './screens/individualChit.js';
 import PostChits from './screens/PostChits.js';
 import Login from './screens/Login.js';
 import Register from './screens/Register.js';
@@ -87,7 +86,7 @@ function App() {
   );
 }
 
-// Home stack navigation nested inside tab navigation
+// Home stack navigation nested inside tab navigation (For expandability)
 function Main() {
   return (
     <Stack.Navigator
@@ -106,7 +105,6 @@ function Main() {
         },
       }}>
       <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="Viewing Chit" component={IndividualChit} />
     </Stack.Navigator>
   );
 }

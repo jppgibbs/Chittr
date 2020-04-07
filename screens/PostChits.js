@@ -1,15 +1,9 @@
 import React, {Component} from 'react';
-import {
-  Text,
-  TextInput,
-  View,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-  PermissionsAndroid,
-} from 'react-native';
+import {Text, View, Alert, StyleSheet, PermissionsAndroid} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import AsyncStorage from '@react-native-community/async-storage';
+import {Input, Button, CheckBox} from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 /*
 ## Post Chits Screen
@@ -51,7 +45,7 @@ class PostChits extends Component {
       x_auth: '',
       chit_content: '',
       locationPermission: false,
-      numChar: 141,
+      locationChecked: false,
     };
   }
   // Run whenever the component is first loaded
@@ -77,7 +71,6 @@ class PostChits extends Component {
         x_auth: x_auth_json,
         user_id: user_id_json,
       });
-
       console.log(
         'Debug: PostChit Loaded with uid: ' +
           this.state.user_id +
@@ -120,15 +113,22 @@ class PostChits extends Component {
     this.retrieveAsync();
     // Get current date and parse it
     var timestamp = Date.parse(new Date());
-    // Format our request
-    let request = JSON.stringify({
-      chit_content: this.state.chit_content,
-      timestamp: timestamp,
-      location: {
-        longitude: JSON.parse(this.state.longitude),
-        latitude: JSON.parse(this.state.latitude),
-      },
-    });
+    // Format our request depending on if the user chose to include location
+    if (this.state.locationChecked === true) {
+      var request = JSON.stringify({
+        chit_content: this.state.chit_content,
+        timestamp: timestamp,
+        location: {
+          longitude: JSON.parse(this.state.longitude),
+          latitude: JSON.parse(this.state.latitude),
+        },
+      });
+    } else {
+      var request = JSON.stringify({
+        chit_content: this.state.chit_content,
+        timestamp: timestamp,
+      });
+    }
     // Format the auth key for the header
     let headerAuth = JSON.parse(this.state.x_auth);
     if (this.state.chit_content !== '') {
@@ -149,7 +149,7 @@ class PostChits extends Component {
             // Check if response is unauthorized to give user feedback
             if (response.status !== 401) {
               console.log('Chit successfully posted');
-              //this.props.navigation.navigate('Home');
+              this.props.navigation.navigate('Home');
             } else {
               Alert.alert('Failed to post.', 'Please log in.');
               console.log('Chit failed to post');
@@ -169,8 +169,12 @@ class PostChits extends Component {
 
   // Post chit then allow the user to take a picture to add to it
   postChitWithPhoto() {
-    this.postChit();
-    this.props.navigation.navigate('Camera');
+    if (this.state.chit_content !== '') {
+      this.postChit();
+      this.props.navigation.navigate('Camera');
+    } else {
+      Alert.alert('Not yet!', 'Write your chit before adding a photo!');
+    }
   }
 
   // Save draft button
@@ -221,10 +225,11 @@ class PostChits extends Component {
         <Text style={styles.title} accessible={true} accessibilityRole="text">
           Talk Chit:
         </Text>
-        <TextInput
-          style={styles.composeChit}
+        <Input
+          inputStyle={styles.composeChit}
+          inputContainerStyle={styles.composeChitContainer}
           placeholderTextColor="#918f8a"
-          placeholder="Howl into the meaningless void known as Chittr"
+          placeholder="Howl violently into the meaningless void known as Chittr"
           autoCapitalize="sentences"
           multiline
           numberOfLines={4}
@@ -240,66 +245,100 @@ class PostChits extends Component {
           accessibilityRole="text">
           141 character limit
         </Text>
-        <TouchableOpacity
-          onPress={() => this.postChit()}
-          style={styles.button}
-          accessible={true}
-          accessibilityComponentType="button"
-          accessibilityRole="button"
-          accessibilityLabel="Create Account"
-          accessibilityHint="Press this to create your account">
-          <Text
-            style={styles.bodyText}
+        <CheckBox
+          title="Add Location"
+          checkedTitle={
+            'Posting location: ' +
+            this.state.latitude +
+            ', ' +
+            this.state.longitude
+          }
+          onPress={() =>
+            this.setState({locationChecked: !this.state.locationChecked})
+          }
+          iconLeft
+          iconType="material"
+          checkedIcon="location-on"
+          uncheckedIcon="location-off"
+          checkedColor="green"
+          checked={this.state.locationChecked}
+          containerStyle={styles.checkboxContainer}
+          textStyle={styles.bodyText}
+        />
+        <View style={styles.buttonGridContainer}>
+          <Button
+            onPress={() => this.postChit()}
+            buttonStyle={styles.button}
+            title="  Post"
             accessible={true}
-            accessibilityRole="text">
-            Post Chit
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.postChitWithPhoto()}
-          style={styles.button}
-          accessible={true}
-          accessibilityComponentType="button"
-          accessibilityRole="button"
-          accessibilityLabel="Create Account"
-          accessibilityHint="Press this to create your account">
-          <Text
-            style={styles.bodyText}
+            icon={
+              <Icon
+                name="paper-plane"
+                size={18}
+                color="white"
+                style={styles.buttonIcon}
+              />
+            }
+            accessibilityComponentType="button"
+            accessibilityRole="button"
+            accessibilityLabel="Post chit"
+            accessibilityHint="Press here to post your chit"
+          />
+          <Button
+            onPress={() => this.postChitWithPhoto()}
+            buttonStyle={styles.buttonSmall}
+            title=" "
+            icon={
+              <Icon
+                name="camera"
+                size={24}
+                color="white"
+                style={styles.buttonIcon}
+              />
+            }
             accessible={true}
-            accessibilityRole="text">
-            Post Chit and Photo
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.saveDraft()}
-          style={styles.button}
-          accessible={true}
-          accessibilityComponentType="button"
-          accessibilityRole="button"
-          accessibilityLabel="Create Account"
-          accessibilityHint="Press this to create your account">
-          <Text
-            style={styles.bodyText}
+            accessibilityComponentType="button"
+            accessibilityRole="button"
+            accessibilityLabel="Post chit with photo"
+            accessibilityHint="Press here to post your chit with a photo"
+          />
+          <Button
+            onPress={() => this.saveDraft()}
+            buttonStyle={styles.button}
+            title="  Save Draft"
+            icon={
+              <Icon
+                name="save"
+                size={18}
+                color="white"
+                style={styles.buttonIcon}
+              />
+            }
             accessible={true}
-            accessibilityRole="text">
-            Save Draft
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.props.navigation.navigate('My Drafts')}
-          style={styles.button}
-          accessible={true}
-          accessibilityComponentType="button"
-          accessibilityRole="button"
-          accessibilityLabel="Create Account"
-          accessibilityHint="Press this to create your account">
-          <Text
-            style={styles.bodyText}
+            accessibilityComponentType="button"
+            accessibilityRole="button"
+            accessibilityLabel="Create Account"
+            accessibilityHint="Press this to create your account"
+          />
+          <Button
+            onPress={() => this.props.navigation.navigate('My Drafts')}
+            buttonStyle={styles.buttonSmall}
+            title=" "
+            icon={
+              <Icon
+                name="folder-open"
+                size={24}
+                color="white"
+                style={styles.buttonIcon}
+              />
+            }
             accessible={true}
-            accessibilityRole="text">
-            View Drafts
-          </Text>
-        </TouchableOpacity>
+            accessibilityComponentType="button"
+            accessibilityRole="button"
+            accessibilityLabel="Create Account"
+            accessibilityHint="Press this to create your account"
+          />
+        </View>
       </View>
     );
   }
@@ -318,29 +357,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 5,
     color: '#ffffff',
-    marginTop: 5,
-    marginBottom: 0,
-    borderColor: '#2296f3',
-    borderRadius: 8,
-    borderWidth: 1,
+    marginVertical: 8,
     backgroundColor: '#273341',
-    elevation: 3,
-    marginLeft: 15,
-    marginRight: 15,
-    height: 80,
+    marginHorizontal: 5,
+    height: 100,
+  },
+  composeChitContainer: {
+    backgroundColor: '#273341',
+    marginHorizontal: 5,
+    marginBottom: 5,
+  },
+  checkboxContainer: {
+    backgroundColor: '#17202b',
+    borderWidth: 0,
+    marginHorizontal: 0,
+    marginVertical: 0,
+    // justifyContent: 'left',
+  },
+  buttonGridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
   button: {
     alignItems: 'center',
-    elevation: 2,
-    padding: 10,
-    marginTop: 5,
-    marginBottom: 0,
-    borderColor: '#101010',
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: '#2296f3',
-    marginLeft: 15,
-    marginRight: 15,
+    marginVertical: 3,
+    marginHorizontal: 4,
+    width: 300,
+  },
+  buttonSmall: {
+    alignItems: 'flex-end',
+    width: 60,
+    marginVertical: 3,
   },
   title: {
     fontSize: 18,
