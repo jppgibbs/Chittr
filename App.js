@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
@@ -33,8 +34,7 @@ function App() {
     <NavigationContainer>
       <Tab.Navigator
         activeColor="#f0edf6"
-        // inactiveColor="#3e2465"
-        barStyle={{backgroundColor: '#182633'}}
+        barStyle={styles.tabBar}
         tabBarOptions={{
           activeBackgroundColor: '#101922',
           style: {backgroundColor: '#182633'},
@@ -196,4 +196,11 @@ const config = {
     restSpeedThreshold: 0.01,
   },
 };
+// Stylesheet
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: '#182633',
+  },
+});
+
 export default App;

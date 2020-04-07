@@ -264,6 +264,10 @@ class PostChits extends Component {
           checked={this.state.locationChecked}
           containerStyle={styles.checkboxContainer}
           textStyle={styles.bodyText}
+          accessible={true}
+          accessibilityRole="checkbox"
+          accessibilityLabel="Add location"
+          accessibilityHint="Toggle whether you want to include your location"
         />
         <View style={styles.buttonGridContainer}>
           <Button

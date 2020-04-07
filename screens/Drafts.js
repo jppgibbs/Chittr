@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 
 import {
   FlatList,
-  TextInput,
   Text,
   View,
   StyleSheet,
@@ -12,7 +11,7 @@ import {
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from 'react-native-geolocation-service';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {Card, Button, Overlay} from 'react-native-elements';
+import {Card, Button, Overlay, Input} from 'react-native-elements';
 import BackgroundTimer from 'react-native-background-timer';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -250,7 +249,7 @@ class Drafts extends Component {
           console.log('(Drafts) Chit scheduled in: ' + difference);
         })
         .catch(error => {
-          console.error('[ERROR] Error adding scheduled Chit. Log: ' + error);
+          console.error('(Drafts) Scheduling failed: ' + error);
         });
     }, difference);
   }
@@ -294,6 +293,11 @@ class Drafts extends Component {
                 <Button
                   buttonStyle={styles.button}
                   type="outline"
+                  accessible={true}
+                  accessibilityComponentType="button"
+                  accessibilityRole="button"
+                  accessibilityLabel="Post"
+                  accessibilityHint="Post this draft"
                   icon={
                     <Icon
                       name="paper-plane"
@@ -307,6 +311,11 @@ class Drafts extends Component {
                 <Button
                   buttonStyle={styles.button}
                   type="outline"
+                  accessible={true}
+                  accessibilityComponentType="button"
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit"
+                  accessibilityHint="Edit this draft"
                   icon={
                     <Icon
                       name="edit"
@@ -323,6 +332,11 @@ class Drafts extends Component {
                 <Button
                   buttonStyle={styles.button}
                   type="outline"
+                  accessible={true}
+                  accessibilityComponentType="button"
+                  accessibilityRole="button"
+                  accessibilityLabel="Delete"
+                  accessibilityHint="Delete this draft"
                   icon={
                     <Icon
                       name="trash"
@@ -338,6 +352,11 @@ class Drafts extends Component {
                 <Button
                   buttonStyle={styles.button}
                   type="outline"
+                  accessible={true}
+                  accessibilityComponentType="button"
+                  accessibilityRole="button"
+                  accessibilityLabel="Schedule"
+                  accessibilityHint="Schedule this draft"
                   icon={
                     <Icon
                       name="clock"
@@ -371,8 +390,9 @@ class Drafts extends Component {
                 children={
                   <View style={styles.modalContent}>
                     <Text style={styles.title}>Edit Draft</Text>
-                    <TextInput
-                      style={styles.textEntry}
+                    <Input
+                      containerStyle={styles.composeChitContainer}
+                      inputStyle={styles.composeChit}
                       defaultValue={
                         this.state.draftList[this.state.array_index]
                           .chit_content
@@ -388,12 +408,22 @@ class Drafts extends Component {
                     <Text style={styles.bodyText}>141 character limit</Text>
                     <Button
                       buttonStyle={styles.buttonModal}
+                      accessible={true}
+                      accessibilityComponentType="button"
+                      accessibilityRole="button"
+                      accessibilityLabel="Post edit"
+                      accessibilityHint="Press here to submit your changes"
                       testID={'edit-chit'}
                       onPress={() => this.editDraft()}
                       title="Edit Chit"
                     />
                     <Button
                       buttonStyle={styles.buttonModal}
+                      accessible={true}
+                      accessibilityComponentType="button"
+                      accessibilityRole="button"
+                      accessibilityLabel="Close window"
+                      accessibilityHint="Press here to close this window"
                       testID={'close-button'}
                       onPress={() => {
                         this.setDialogVisible(!this.state.isDialogVisible);
@@ -426,7 +456,7 @@ class Drafts extends Component {
                   mode="time" // Limited to time only, modify to allow date scheduling
                   placeholder="Pick a time"
                   format="DD-MM-YYYY HH-mm"
-                  onDateChange={(date) => {
+                  onDateChange={date => {
                     this.setState({date: date});
                     this.scheduleChit();
                   }}
@@ -475,6 +505,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#1b2734',
     elevation: 2,
     flexDirection: 'row',
+  },
+  composeChit: {
+    alignItems: 'center',
+    padding: 5,
+    color: '#ffffff',
+    marginVertical: 8,
+    backgroundColor: '#273341',
+    marginHorizontal: 5,
+    height: 100,
+  },
+  composeChitContainer: {
+    backgroundColor: '#273341',
+    marginHorizontal: 5,
+    marginBottom: 5,
   },
   textContainer: {
     flex: 1,
