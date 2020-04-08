@@ -91,7 +91,7 @@ class Camera extends Component {
       },
     )
       .then(response => {
-        this.props.navigation.navigate('Home');
+        this.props.navigation.navigate('New Chit');
         console.log('Photo taken');
       })
       .catch(error => {

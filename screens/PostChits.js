@@ -149,7 +149,7 @@ class PostChits extends Component {
             // Check if response is unauthorized to give user feedback
             if (response.status !== 401) {
               console.log('Chit successfully posted');
-              this.props.navigation.navigate('Home');
+              // this.props.navigation.navigate('Home');
             } else {
               Alert.alert('Failed to post.', 'Please log in.');
               console.log('Chit failed to post');

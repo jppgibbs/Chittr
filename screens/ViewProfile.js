@@ -365,11 +365,6 @@ class ViewProfile extends Component {
                     imageProps={{
                       resizeMode: 'cover',
                       placeholderStyle: styles.chitHideImage,
-                      PlaceholderContent: (
-                        <View>
-                          <ActivityIndicator />
-                        </View>
-                      ),
                     }}
                     image={{
                       uri:

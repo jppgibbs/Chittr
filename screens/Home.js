@@ -196,7 +196,7 @@ class Home extends Component {
                   (item.location = ' ')
                 ) : (
                   <Text
-                    style={styles.timestamp}
+                    style={styles.locationText}
                     accessible={true}
                     accessibilityRole="text">
                     {'Location: ' +
@@ -240,9 +240,14 @@ const styles = StyleSheet.create({
   },
   timestampContainer: {flexGrow: 1},
   timestamp: {
-    fontSize: 14,
+    fontSize: 10,
     color: '#ffffff',
     marginTop: 7,
+  },
+  locationText: {
+    fontSize: 16,
+    color: '#ffffff',
+    marginTop: 3,
   },
   chitContainer: {
     margin: 1,
