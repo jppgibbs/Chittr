@@ -1,15 +1,8 @@
 import React, {Component} from 'react';
-import {
-  Text,
-  TextInput,
-  View,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {Text, View, Alert, StyleSheet} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {Input, Button, ThemeConsumer} from 'react-native-elements';
+import {Input, Button} from 'react-native-elements';
 
 /*
 ## Edit Profile Screen
@@ -193,7 +186,7 @@ class EditProfile extends Component {
           accessibilityHint="Enter the password you wish to use for your account"
         />
         <Button
-          onPress={() => this.createAccount()}
+          onPress={() => this.editAccount()}
           buttonStyle={styles.button}
           title="Submit Changes"
           accessible={true}

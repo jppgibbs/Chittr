@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-
 import {
   FlatList,
   Text,
@@ -7,6 +6,7 @@ import {
   StyleSheet,
   Alert,
   PermissionsAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from 'react-native-geolocation-service';
@@ -14,8 +14,13 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Card, Button, Overlay, Input} from 'react-native-elements';
 import BackgroundTimer from 'react-native-background-timer';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
 import Modal from 'react-native-modal';
+
+/*
+## Drafts Screen
+- On this screen the saved drafts are loaded from async and displayed
+- Each draft has 4 buttons, offering the ability to post, edit, delete and schedule individual drafts
+*/
 
 // Check if user has location permissions, if not, prompt to allow it
 async function requestLocationPermission() {
@@ -107,6 +112,9 @@ class Drafts extends Component {
     } catch (e) {
       console.error('(Drafts) Error retrieving from async: ' + e);
     }
+    this.setState({
+      isLoading: false,
+    });
   }
 
   // #######################################
@@ -277,200 +285,209 @@ class Drafts extends Component {
   render() {
     let timestamp = new Date();
     console.log('(Drafts) Current Listed Drafts: ' + this.state.draftList);
-    return (
-      <View style={styles.mainView}>
-        <FlatList
-          style={styles.chitList}
-          keyExtractor={({chit_content}) => chit_content.toString()}
-          data={this.state.draftList}
-          renderItem={({item, index}) => (
-            <Card containerStyle={styles.chitContainer}>
-              <View style={styles.textContainer}>
-                <Text style={styles.bodyText}>{item.chit_content}</Text>
-                <Text>{'\n'}</Text>
-              </View>
-              <View style={styles.buttonContainer}>
-                <Button
-                  buttonStyle={styles.button}
-                  type="outline"
-                  accessible={true}
-                  accessibilityComponentType="button"
-                  accessibilityRole="button"
-                  accessibilityLabel="Post"
-                  accessibilityHint="Post this draft"
-                  icon={
-                    <Icon
-                      name="paper-plane"
-                      size={26}
-                      color="white"
-                      style={styles.buttonIcon}
-                    />
+    if (this.state.isLoading === true) {
+      // Show loading wheel if data isn't loaded yet
+      return (
+        <View style={styles.mainView}>
+          <ActivityIndicator />
+        </View>
+      );
+    } else {
+      return (
+        <View style={styles.mainView}>
+          <FlatList
+            style={styles.chitList}
+            keyExtractor={({chit_content}) => chit_content.toString()}
+            data={this.state.draftList}
+            renderItem={({item, index}) => (
+              <Card containerStyle={styles.chitContainer}>
+                <View style={styles.textContainer}>
+                  <Text style={styles.bodyText}>{item.chit_content}</Text>
+                  <Text>{'\n'}</Text>
+                </View>
+                <View style={styles.buttonContainer}>
+                  <Button
+                    buttonStyle={styles.button}
+                    type="outline"
+                    accessible={true}
+                    accessibilityComponentType="button"
+                    accessibilityRole="button"
+                    accessibilityLabel="Post"
+                    accessibilityHint="Post this draft"
+                    icon={
+                      <Icon
+                        name="paper-plane"
+                        size={26}
+                        color="white"
+                        style={styles.buttonIcon}
+                      />
+                    }
+                    onPress={() => this.postDraft(item.chit_content)} // delete draft when posted??
+                  />
+                  <Button
+                    buttonStyle={styles.button}
+                    type="outline"
+                    accessible={true}
+                    accessibilityComponentType="button"
+                    accessibilityRole="button"
+                    accessibilityLabel="Edit"
+                    accessibilityHint="Edit this draft"
+                    icon={
+                      <Icon
+                        name="edit"
+                        size={26}
+                        color="white"
+                        style={styles.buttonIcon}
+                      />
+                    }
+                    onPress={() => {
+                      this.setDialogVisible(!this.state.isDialogVisible);
+                      this.setIndexAccessed(index);
+                    }}
+                  />
+                  <Button
+                    buttonStyle={styles.button}
+                    type="outline"
+                    accessible={true}
+                    accessibilityComponentType="button"
+                    accessibilityRole="button"
+                    accessibilityLabel="Delete"
+                    accessibilityHint="Delete this draft"
+                    icon={
+                      <Icon
+                        name="trash"
+                        size={26}
+                        color="white"
+                        style={styles.buttonIcon}
+                      />
+                    }
+                    onPress={() => {
+                      this.createDeleteDraftArray(index);
+                    }}
+                  />
+                  <Button
+                    buttonStyle={styles.button}
+                    type="outline"
+                    accessible={true}
+                    accessibilityComponentType="button"
+                    accessibilityRole="button"
+                    accessibilityLabel="Schedule"
+                    accessibilityHint="Schedule this draft"
+                    icon={
+                      <Icon
+                        name="clock"
+                        size={26}
+                        color="white"
+                        style={styles.buttonIcon}
+                      />
+                    }
+                    onPress={() => {
+                      this.setState({current_draft: item.chit_content});
+                      this.setTimePicker(!this.state.isScheduleDialogVisible);
+                    }}
+                  />
+                </View>
+                <Overlay
+                  animationType="slide"
+                  testID={'modal'}
+                  isVisible={this.state.isDialogVisible}
+                  backdropColor="#B4B3DB"
+                  backdropOpacity={0.8}
+                  animationIn="zoomInDown"
+                  animationOut="zoomOutUp"
+                  animationInTiming={600}
+                  animationOutTiming={600}
+                  overlayStyle={styles.modalContent}
+                  backdropTransitionInTiming={600}
+                  backdropTransitionOutTiming={600}
+                  onBackdropPress={() =>
+                    this.setDialogVisible(!this.state.isDialogVisible)
                   }
-                  onPress={() => this.postDraft(item.chit_content)} // delete draft when posted??
-                />
-                <Button
-                  buttonStyle={styles.button}
-                  type="outline"
-                  accessible={true}
-                  accessibilityComponentType="button"
-                  accessibilityRole="button"
-                  accessibilityLabel="Edit"
-                  accessibilityHint="Edit this draft"
-                  icon={
-                    <Icon
-                      name="edit"
-                      size={26}
-                      color="white"
-                      style={styles.buttonIcon}
-                    />
+                  children={
+                    <View style={styles.modalContent}>
+                      <Text style={styles.title}>Edit Draft</Text>
+                      <Input
+                        containerStyle={styles.composeChitContainer}
+                        inputStyle={styles.composeChit}
+                        defaultValue={
+                          this.state.draftList[this.state.array_index]
+                            .chit_content
+                        }
+                        autoCapitalize="sentences"
+                        multiline
+                        numberOfLines={4}
+                        maxLength={141}
+                        onChangeText={text =>
+                          this.setState({current_draft: text})
+                        }
+                      />
+                      <Text style={styles.bodyText}>141 character limit</Text>
+                      <Button
+                        buttonStyle={styles.buttonModal}
+                        accessible={true}
+                        accessibilityComponentType="button"
+                        accessibilityRole="button"
+                        accessibilityLabel="Post edit"
+                        accessibilityHint="Press here to submit your changes"
+                        testID={'edit-chit'}
+                        onPress={() => this.editDraft()}
+                        title="Edit Chit"
+                      />
+                      <Button
+                        buttonStyle={styles.buttonModal}
+                        accessible={true}
+                        accessibilityComponentType="button"
+                        accessibilityRole="button"
+                        accessibilityLabel="Close window"
+                        accessibilityHint="Press here to close this window"
+                        testID={'close-button'}
+                        onPress={() => {
+                          this.setDialogVisible(!this.state.isDialogVisible);
+                        }}
+                        title="Close"
+                      />
+                    </View>
                   }
-                  onPress={() => {
-                    this.setDialogVisible(!this.state.isDialogVisible);
-                    this.setIndexAccessed(index);
-                  }}
                 />
-                <Button
-                  buttonStyle={styles.button}
-                  type="outline"
-                  accessible={true}
-                  accessibilityComponentType="button"
-                  accessibilityRole="button"
-                  accessibilityLabel="Delete"
-                  accessibilityHint="Delete this draft"
-                  icon={
-                    <Icon
-                      name="trash"
-                      size={26}
-                      color="white"
-                      style={styles.buttonIcon}
-                    />
-                  }
-                  onPress={() => {
-                    this.createDeleteDraftArray(index);
-                  }}
-                />
-                <Button
-                  buttonStyle={styles.button}
-                  type="outline"
-                  accessible={true}
-                  accessibilityComponentType="button"
-                  accessibilityRole="button"
-                  accessibilityLabel="Schedule"
-                  accessibilityHint="Schedule this draft"
-                  icon={
-                    <Icon
-                      name="clock"
-                      size={26}
-                      color="white"
-                      style={styles.buttonIcon}
-                    />
-                  }
-                  onPress={() => {
-                    this.setState({current_draft: item.chit_content});
-                    this.setTimePicker(!this.state.isScheduleDialogVisible);
-                  }}
-                />
-              </View>
-              <Overlay
-                animationType="slide"
-                testID={'modal'}
-                isVisible={this.state.isDialogVisible}
-                backdropColor="#B4B3DB"
-                backdropOpacity={0.8}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                overlayStyle={styles.modalContent}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}
-                onBackdropPress={() =>
-                  this.setDialogVisible(!this.state.isDialogVisible)
-                }
-                children={
-                  <View style={styles.modalContent}>
-                    <Text style={styles.title}>Edit Draft</Text>
-                    <Input
-                      containerStyle={styles.composeChitContainer}
-                      inputStyle={styles.composeChit}
-                      defaultValue={
-                        this.state.draftList[this.state.array_index]
-                          .chit_content
-                      }
-                      autoCapitalize="sentences"
-                      multiline
-                      numberOfLines={4}
-                      maxLength={141}
-                      onChangeText={text =>
-                        this.setState({current_draft: text})
-                      }
-                    />
-                    <Text style={styles.bodyText}>141 character limit</Text>
-                    <Button
-                      buttonStyle={styles.buttonModal}
-                      accessible={true}
-                      accessibilityComponentType="button"
-                      accessibilityRole="button"
-                      accessibilityLabel="Post edit"
-                      accessibilityHint="Press here to submit your changes"
-                      testID={'edit-chit'}
-                      onPress={() => this.editDraft()}
-                      title="Edit Chit"
-                    />
-                    <Button
-                      buttonStyle={styles.buttonModal}
-                      accessible={true}
-                      accessibilityComponentType="button"
-                      accessibilityRole="button"
-                      accessibilityLabel="Close window"
-                      accessibilityHint="Press here to close this window"
-                      testID={'close-button'}
-                      onPress={() => {
-                        this.setDialogVisible(!this.state.isDialogVisible);
-                      }}
-                      title="Close"
-                    />
-                  </View>
-                }
-              />
-              <Modal
-                animationType="slide"
-                visible={this.state.isScheduleDialogVisible}
-                testID={'Schedule-Modal'}
-                backdropColor="#B4B3DB"
-                backdropOpacity={0.2}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}
-                onBackdropPress={() =>
-                  this.setTimePicker(!this.state.isScheduleDialogVisible)
-                }>
-                <DateTimePicker
-                  buttonStyle={styles.dateTimePicker}
-                  style={styles.dateTimePicker}
-                  value={new Date()}
-                  //date={this.state.date}
-                  mode="time" // Limited to time only, modify to allow date scheduling
-                  placeholder="Pick a time"
-                  format="DD-MM-YYYY HH-mm"
-                  onDateChange={date => {
-                    this.setState({date: date});
-                    this.scheduleChit();
-                  }}
-                  onChange={date => {
-                    this.setState({date: date});
-                    this.scheduleChit();
-                  }}
-                />
-              </Modal>
-            </Card>
-          )}
-        />
-      </View>
-    );
+                <Modal
+                  animationType="slide"
+                  visible={this.state.isScheduleDialogVisible}
+                  testID={'Schedule-Modal'}
+                  backdropColor="#B4B3DB"
+                  backdropOpacity={0.2}
+                  animationIn="zoomInDown"
+                  animationOut="zoomOutUp"
+                  animationInTiming={600}
+                  animationOutTiming={600}
+                  backdropTransitionInTiming={600}
+                  backdropTransitionOutTiming={600}
+                  onBackdropPress={() =>
+                    this.setTimePicker(!this.state.isScheduleDialogVisible)
+                  }>
+                  <DateTimePicker
+                    buttonStyle={styles.dateTimePicker}
+                    style={styles.dateTimePicker}
+                    value={new Date()}
+                    //date={this.state.date}
+                    mode="time" // Limited to time only, modify to allow date scheduling
+                    placeholder="Pick a time"
+                    format="DD-MM-YYYY HH-mm"
+                    onDateChange={date => {
+                      this.setState({date: date});
+                      this.scheduleChit();
+                    }}
+                    onChange={date => {
+                      this.setState({date: date});
+                      this.scheduleChit();
+                    }}
+                  />
+                </Modal>
+              </Card>
+            )}
+          />
+        </View>
+      );
+    }
   }
 }
 
@@ -479,6 +496,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: '#17202b',
     color: '#ffffff',
+    height: '100%',
   },
   title: {
     fontSize: 18,

@@ -14,6 +14,7 @@ import {Card, Avatar} from 'react-native-elements';
 ## Home Screen
 - This will be the first page the user lands on when they open the app.
 - It displays all chits from accounts the user is following, sorting most recent first.
+- A users name or profile picture can be pressed to navigate to their account screen
 */
 
 class Home extends Component {
@@ -60,7 +61,7 @@ class Home extends Component {
   // Retrieve chits from the database
   getData() {
     // Connect to mudfoot server and retrieve data (start={Index to start from}; count={Number of chits to display})
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=30')
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=10')
       .then(response => response.json())
       .then(responseJson => {
         // Once we have a JSON response stop displaying placeholder and update the chit list
@@ -130,8 +131,6 @@ class Home extends Component {
           // Create list to store individual chit cards inside
           style={styles.chitMargin}
           data={this.state.chitList}
-          // onEndReachedThreshold={0.25}
-          // onEndReached={this.loadChits} // Load More
           keyExtractor={({chit_id}) => chit_id.toString()}
           renderItem={({item}) => (
             <Card

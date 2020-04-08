@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Input, Button} from 'react-native-elements';
 
 /*
-## Edit Profile Screen
+## Register Screen
 - Allows the user to create a new account using the details they enter
 */
 

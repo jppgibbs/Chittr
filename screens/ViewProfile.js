@@ -12,6 +12,13 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {ListItem, Button, Overlay, Card} from 'react-native-elements';
 
+/*
+## View Profile Screen
+- This screen displays another user's profile details
+- The buttons on this page offer the ability to view recent chits, follow, unfollow,
+view their followers and who they're following
+*/
+
 class ViewProfile extends Component {
   // Construct variables with default empty values
   constructor(props) {

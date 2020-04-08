@@ -12,6 +12,12 @@ class SearchUser extends Component {
     };
   }
 
+  /*
+## Search User Screen
+- This screen allows the user to search all accounts stored in the database
+- When a user in the search results is selected, their profile page will be navigated to.
+*/
+
   componentDidMount() {
     this.searchUser('');
   }
