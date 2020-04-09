@@ -17,7 +17,7 @@ import SearchUserScreen from './screens/SearchUser.js';
 import ViewOtherProfile from './screens/ViewProfile.js';
 import ChangeProfilePic from './screens/EditProfilePic.js';
 import Drafts from './screens/Drafts.js';
-
+console.disableYellowBox = true;
 /*
 ## App.js
 - This file is responsible for the initialization of all of the navigations,
